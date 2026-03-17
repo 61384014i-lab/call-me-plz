@@ -24,38 +24,30 @@
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
-        /* 手機外殼 */
         #phone-case {
             width: 340px;
             background-color: var(--phone-bg);
             border-radius: 50px;
             padding: 15px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.2);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
             border: 6px solid #444;
             position: relative;
         }
 
-        /* 頂部瀏海 */
         #notch {
-            width: 150px;
-            height: 25px;
-            background: #444;
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            width: 150px; height: 25px; background: #444;
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
             z-index: 5;
         }
 
-        /* 螢幕顯示區 */
         #screen {
             background-color: var(--screen-bg);
             border-radius: 35px;
-            height: 240px;
+            height: 250px;
             margin-top: 10px;
             margin-bottom: 20px;
             display: flex;
@@ -67,51 +59,42 @@
             border: 4px solid #b2ebf2;
         }
 
-        #role-icon {
-            font-size: 4.5rem;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
-        }
+        #role-icon { font-size: 4.5rem; margin-bottom: 5px; }
 
         .target-box {
-            background: rgba(255,255,255,0.6);
-            padding: 8px 15px;
-            border-radius: 15px;
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
+            border-radius: 20px;
             text-align: center;
+            width: 100%;
         }
 
-        .ruby-text {
-            display: inline-block;
-            text-align: center;
-            margin: 0 3px;
-        }
-        .ruby-main { display: block; font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
-        .ruby-sub { display: block; font-size: 0.65rem; color: #78909C; }
+        .ruby-text { display: inline-block; text-align: center; margin: 0 3px; vertical-align: bottom; }
+        .ruby-main { display: block; font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        .ruby-sub { display: block; font-size: 0.7rem; color: #78909C; line-height: 1.2; }
 
         #target-number {
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 900;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--accent-pink);
-            margin-top: 5px;
-            text-shadow: 1px 1px 0 white;
+            margin-top: 8px;
         }
 
         #dialed-display {
             font-size: 1.8rem;
             color: #263238;
             min-height: 2.2rem;
-            margin-top: 15px;
+            margin-top: 10px;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
-        /* 按鍵區 */
         #keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 10px;
+            gap: 12px;
+            padding: 5px;
         }
 
         .key {
@@ -123,57 +106,42 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 6px 0 #CFD8DC;
+            transition: all 0.1s;
+            box-shadow: 0 5px 0 #CFD8DC;
             user-select: none;
         }
 
-        .key:active {
-            transform: scale(0.92) translateY(4px);
-            box-shadow: 0 2px 0 #CFD8DC;
-        }
+        .key:active { transform: translateY(3px); box-shadow: 0 2px 0 #CFD8DC; }
 
-        .key .hanzi { font-size: 1.7rem; font-weight: bold; color: #455A64; }
-        .key .pinyin-zhuyin { font-size: 0.7rem; color: #90A4AE; line-height: 1.1; }
+        .key .hanzi { font-size: 1.6rem; font-weight: bold; color: #455A64; }
+        .key .pinyin-zhuyin { font-size: 0.65rem; color: #90A4AE; text-align: center; }
 
         .key.action { color: white; font-size: 2.2rem; }
-        #key-delete { background-color: var(--btn-delete); box-shadow: 0 6px 0 #E64A19; }
-        #key-call { background-color: var(--btn-call); box-shadow: 0 6px 0 #388E3C; }
+        #key-delete { background-color: var(--btn-delete); box-shadow: 0 5px 0 #E64A19; }
+        #key-call { background-color: var(--btn-call); box-shadow: 0 5px 0 #388E3C; }
 
-        /* 遊戲結束覆蓋層 */
         #overlay {
             position: absolute;
             top: 15px; left: 15px; right: 15px; bottom: 15px;
-            background: rgba(255,255,255,0.96);
+            background: rgba(255,255,255,0.97);
             border-radius: 35px;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            animation: fadeIn 0.4s;
+            padding: 20px;
+            text-align: center;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        #status-text { font-size: 1.4rem; font-weight: bold; margin-bottom: 30px; line-height: 1.6; color: var(--text-main); }
+        #status-text { font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; color: var(--text-main); white-space: pre-wrap; }
 
         #retry-btn {
-            width: 80px;
-            height: 80px;
-            font-size: 2.5rem;
-            background-color: #64B5F6;
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #1E88E5;
-            display: none; /* 初始隱藏 */
-            align-items: center;
-            justify-content: center;
+            width: 90px; height: 90px; font-size: 3rem;
+            background-color: #64B5F6; border: none; border-radius: 50%;
+            color: white; cursor: pointer; box-shadow: 0 6px 0 #1E88E5;
+            display: none; align-items: center; justify-content: center;
         }
-        
-        #retry-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1E88E5; }
     </style>
 </head>
 <body>
@@ -190,11 +158,9 @@
         </div>
         <div id="dialed-display"></div>
     </div>
-
     <div id="keypad"></div>
-
     <div id="overlay">
-        <div id="status-text">...</div>
+        <div id="status-text"></div>
         <button id="retry-btn" onclick="startGame()">🔄</button>
     </div>
 </div>
@@ -218,8 +184,7 @@
         {name: "媽媽", p: "māma", z: "ㄇㄚㄇㄚ", icon: "👩‍🍳"},
         {name: "老師", p: "lǎoshī", z: "ㄌㄠˇㄕ", icon: "👩‍🏫"},
         {name: "奶奶", p: "nǎinai", z: "ㄋㄞˇㄋㄞ", icon: "👵"},
-        {name: "警察", p: "Bōlì", z: "ㄅㄛㄌㄧˋ", icon: "🚓"},
-        {name: "醫院", p: "Ānbǎo", z: "ㄢㄅㄠˇ", icon: "🚑"}
+        {name: "警察", p: "jǐngchá", z: "ㄐㄧㄥˇㄔㄚˊ", icon: "👮"}
     ];
 
     let targetNum = "";
@@ -229,3 +194,141 @@
     function startGame() {
         currentInput = "";
         document.getElementById('dialed-display').innerText = "";
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('retry-btn').style.display = 'none';
+        
+        // 1. 隨機角色與長度 (8 或 10)
+        const role = roles[Math.floor(Math.random() * roles.length)];
+        const len = Math.random() > 0.5 ? 8 : 10;
+        targetNum = "";
+        for(let i=0; i<len; i++) targetNum += Math.floor(Math.random()*10);
+
+        document.getElementById('role-icon').innerText = role.icon;
+        document.getElementById('target-name-container').innerHTML = `
+            <div class="ruby-text"><span class="ruby-main">${role.name}</span><span class="ruby-sub">${role.p}/${role.z}</span></div>
+        `;
+        document.getElementById('target-number').innerText = targetNum;
+
+        renderKeypad();
+    }
+
+    function renderKeypad() {
+        const keypad = document.getElementById('keypad');
+        keypad.innerHTML = "";
+
+        // 2. 正確執行 0-9 隨機排列
+        let shuffledChars = [...characters].sort(() => Math.random() - 0.5);
+
+        // 佈局邏輯：
+        // 前 9 格放入洗牌後的前 9 個數字
+        // 第 10 格：刪除鍵
+        // 第 11 格：洗牌後的第 10 個數字
+        // 第 12 格：撥號鍵
+        
+        for(let i=0; i<9; i++) {
+            keypad.appendChild(createKeyElement(shuffledChars[i]));
+        }
+
+        // 刪除鍵 (←)
+        keypad.appendChild(createActionButton("←", "key-delete", () => {
+            currentInput = currentInput.slice(0, -1);
+            document.getElementById('dialed-display').innerText = currentInput;
+        }));
+
+        // 最後一個數字 (第 10 個)
+        keypad.appendChild(createKeyElement(shuffledChars[9]));
+
+        // 撥號鍵 (📞)
+        keypad.appendChild(createActionButton("📞", "key-call", handleCall));
+    }
+
+    function createKeyElement(char) {
+        const div = document.createElement('div');
+        div.className = 'key';
+        div.innerHTML = `<span class="hanzi">${char.h}</span>
+                         <span class="pinyin-zhuyin">${char.z}<br>${char.p}</span>`;
+        div.onclick = () => {
+            if(currentInput.length < 12) {
+                currentInput += char.v;
+                document.getElementById('dialed-display').innerText = currentInput;
+                speak(char.h);
+            }
+        };
+        return div;
+    }
+
+    function createActionButton(content, id, callback) {
+        const div = document.createElement('div');
+        div.className = 'key action';
+        div.id = id;
+        div.innerHTML = content;
+        div.onclick = callback;
+        return div;
+    }
+
+    function speak(text, callback) {
+        window.speechSynthesis.cancel(); // 停止之前的語音
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'zh-TW';
+        msg.rate = 0.9;
+        
+        // 修正 callback 觸發不穩定的問題
+        let called = false;
+        msg.onend = () => {
+            if(!called && callback) { called = true; callback(); }
+        };
+        // 備援機制：如果語音 3 秒沒結束也強制顯示按鈕
+        if(callback) setTimeout(() => { if(!called) { called = true; callback(); } }, 3000);
+
+        window.speechSynthesis.speak(msg);
+    }
+
+    function playBeep() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = 400;
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+    }
+
+    function handleCall() {
+        if(currentInput === "") return;
+        
+        const overlay = document.getElementById('overlay');
+        const statusText = document.getElementById('status-text');
+        overlay.style.display = 'flex';
+        statusText.innerText = "撥號中...\n嘟... 嘟...";
+
+        let count = 0;
+        const interval = setInterval(() => {
+            playBeep();
+            count++;
+            if(count >= 3) {
+                clearInterval(interval);
+                const isSuccess = (currentInput === targetNum);
+                if(isSuccess) {
+                    statusText.innerHTML = "成功通話！\n「喂，你好！」\n✨ 😊 ✨";
+                    speak("喂，你好", () => {
+                        document.getElementById('retry-btn').style.display = 'flex';
+                    });
+                } else {
+                    statusText.innerHTML = "打不通...\n「號碼是空號」\n❌ 😵 ❌";
+                    speak("您撥的號碼是空號", () => {
+                        document.getElementById('retry-btn').style.display = 'flex';
+                    });
+                }
+            }
+        }, 1200);
+    }
+
+    startGame();
+</script>
+
+</body>
+</html>
