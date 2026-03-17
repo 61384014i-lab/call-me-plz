@@ -3,169 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小小接線生 - 中文數字練習</title>
+    <title>小星星電話亭 - 中文數字練習</title>
     <style>
         :root {
-            --primary-color: #FF6B6B;
-            --secondary-color: #4ECDC4;
-            --accent-color: #FFE66D;
-            --bg-color: #F7FFF7;
-            --key-bg: #FFFFFF;
+            --phone-bg: #333333;
+            --screen-bg: #E0F7FA;
+            --btn-number: #FFFFFF;
+            --btn-delete: #FFAB91;
+            --btn-call: #81C784;
+            --text-main: #37474F;
+            --accent-pink: #FF80AB;
         }
 
         body {
             font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            touch-action: manipulation;
+            overflow: hidden;
         }
 
-        #phone-container {
-            width: 350px;
-            background-color: #333;
-            border-radius: 40px;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            border: 8px solid #444;
+        /* 手機外殼 */
+        #phone-case {
+            width: 340px;
+            background-color: var(--phone-bg);
+            border-radius: 50px;
+            padding: 15px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.2);
+            border: 6px solid #444;
             position: relative;
+        }
+
+        /* 頂部瀏海 */
+        #notch {
+            width: 150px;
+            height: 25px;
+            background: #444;
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 5;
         }
 
         /* 螢幕顯示區 */
         #screen {
-            background-color: var(--accent-color);
-            border-radius: 20px;
-            height: 220px;
+            background-color: var(--screen-bg);
+            border-radius: 35px;
+            height: 240px;
+            margin-top: 10px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 4px solid #b2ebf2;
         }
 
         #role-icon {
-            font-size: 4rem; /* 放大人物圖示 */
-            margin-bottom: 5px;
+            font-size: 4.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
         }
 
-        #target-info {
-            font-size: 1rem;
-            color: #333;
+        .target-box {
+            background: rgba(255,255,255,0.6);
+            padding: 8px 15px;
+            border-radius: 15px;
+            text-align: center;
         }
 
         .ruby-text {
             display: inline-block;
             text-align: center;
-            margin: 0 2px;
+            margin: 0 3px;
         }
-        .ruby-main { display: block; font-size: 1.2rem; font-weight: bold; }
-        .ruby-sub { display: block; font-size: 0.7rem; color: #555; }
+        .ruby-main { display: block; font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
+        .ruby-sub { display: block; font-size: 0.65rem; color: #78909C; }
 
         #target-number {
             font-size: 2.2rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #222;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: var(--accent-pink);
             margin-top: 5px;
+            text-shadow: 1px 1px 0 white;
         }
 
         #dialed-display {
             font-size: 1.8rem;
-            color: var(--primary-color);
+            color: #263238;
             min-height: 2.2rem;
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: bold;
-            background: rgba(255,255,255,0.5);
-            width: 90%;
-            border-radius: 10px;
+            letter-spacing: 1px;
         }
 
         /* 按鍵區 */
         #keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 15px;
+            padding: 10px;
         }
 
         .key {
-            background-color: var(--key-bg);
-            border-radius: 15px;
-            height: 80px;
+            background-color: var(--btn-number);
+            border-radius: 20px;
+            height: 75px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s;
-            box-shadow: 0 4px 0 #ddd;
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0 #CFD8DC;
             user-select: none;
         }
 
         .key:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #ddd;
+            transform: scale(0.92) translateY(4px);
+            box-shadow: 0 2px 0 #CFD8DC;
         }
 
-        .key .hanzi { font-size: 1.6rem; font-weight: bold; }
-        .key .pinyin-zhuyin { font-size: 0.7rem; color: #666; margin-top: 2px; }
+        .key .hanzi { font-size: 1.7rem; font-weight: bold; color: #455A64; }
+        .key .pinyin-zhuyin { font-size: 0.7rem; color: #90A4AE; line-height: 1.1; }
 
-        .key.action { color: white; font-size: 2rem; }
-        #key-delete { background-color: #FF9F43; }
-        #key-call { background-color: #2ECC71; }
+        .key.action { color: white; font-size: 2.2rem; }
+        #key-delete { background-color: var(--btn-delete); box-shadow: 0 6px 0 #E64A19; }
+        #key-call { background-color: var(--btn-call); box-shadow: 0 6px 0 #388E3C; }
 
-        /* 覆蓋層 */
+        /* 遊戲結束覆蓋層 */
         #overlay {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.95);
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            background: rgba(255,255,255,0.96);
             border-radius: 35px;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            text-align: center;
-            padding: 20px;
+            animation: fadeIn 0.4s;
         }
 
-        #status-text { font-size: 1.5rem; margin-bottom: 20px; color: #333; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        button#retry-btn {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            background-color: var(--secondary-color);
+        #status-text { font-size: 1.4rem; font-weight: bold; margin-bottom: 30px; line-height: 1.6; color: var(--text-main); }
+
+        #retry-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 2.5rem;
+            background-color: #64B5F6;
             border: none;
-            border-radius: 50px;
+            border-radius: 50%;
             color: white;
             cursor: pointer;
-            box-shadow: 0 4px 0 #3bb4ac;
+            box-shadow: 0 6px 0 #1E88E5;
+            display: none; /* 初始隱藏 */
+            align-items: center;
+            justify-content: center;
         }
+        
+        #retry-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1E88E5; }
     </style>
 </head>
 <body>
 
-<div id="phone-container">
+<div id="phone-case">
+    <div id="notch"></div>
     <div id="screen">
         <div id="role-icon">👤</div>
-        <div id="target-info">
+        <div class="target-box">
             <div class="ruby-text"><span class="ruby-main">打</span><span class="ruby-sub">dǎ/ㄉㄚˇ</span></div>
             <div class="ruby-text"><span class="ruby-main">給</span><span class="ruby-sub">gěi/ㄍㄟˇ</span></div>
             <span id="target-name-container"></span>
+            <div id="target-number">00000000</div>
         </div>
-        <div id="target-number">0000000</div>
         <div id="dialed-display"></div>
     </div>
 
     <div id="keypad"></div>
 
     <div id="overlay">
-        <h2 id="status-text">...</h2>
-        <button id="retry-btn" onclick="startGame()">再一次 (Zài yī cì)</button>
+        <div id="status-text">...</div>
+        <button id="retry-btn" onclick="startGame()">🔄</button>
     </div>
 </div>
 
@@ -188,8 +218,8 @@
         {name: "媽媽", p: "māma", z: "ㄇㄚㄇㄚ", icon: "👩‍🍳"},
         {name: "老師", p: "lǎoshī", z: "ㄌㄠˇㄕ", icon: "👩‍🏫"},
         {name: "奶奶", p: "nǎinai", z: "ㄋㄞˇㄋㄞ", icon: "👵"},
-        {name: "警察", p: "jǐngchá", z: "ㄐㄧㄥˇㄔㄚˊ", icon: "👮"},
-        {name: "醫生", p: "yīshēng", z: "ㄧㄕㄥ", icon: "👨‍⚕️"}
+        {name: "警察", p: "Bōlì", z: "ㄅㄛㄌㄧˋ", icon: "🚓"},
+        {name: "醫院", p: "Ānbǎo", z: "ㄢㄅㄠˇ", icon: "🚑"}
     ];
 
     let targetNum = "";
@@ -199,125 +229,3 @@
     function startGame() {
         currentInput = "";
         document.getElementById('dialed-display').innerText = "";
-        document.getElementById('overlay').style.display = 'none';
-        
-        const role = roles[Math.floor(Math.random() * roles.length)];
-        const len = Math.floor(Math.random() * 4) + 7;
-        targetNum = "";
-        for(let i=0; i<len; i++) targetNum += Math.floor(Math.random()*10);
-
-        document.getElementById('role-icon').innerText = role.icon;
-        document.getElementById('target-name-container').innerHTML = `
-            <div class="ruby-text"><span class="ruby-main">${role.name}</span><span class="ruby-sub">${role.p}/${role.z}</span></div>
-        `;
-        document.getElementById('target-number').innerText = targetNum;
-
-        renderKeypad();
-    }
-
-    function renderKeypad() {
-        const keypad = document.getElementById('keypad');
-        keypad.innerHTML = "";
-
-        // 0-9 全部參與隨機排列
-        let allNumbers = [...characters].sort(() => Math.random() - 0.5);
-
-        // 前 9 個放進格子
-        for(let i=0; i<9; i++) {
-            keypad.appendChild(createKeyElement(allNumbers[i]));
-        }
-
-        // 最後一列：刪除(←) | 第10個隨機數字 | 通話(📞)
-        keypad.appendChild(createActionButton("←", "key-delete", () => {
-            currentInput = currentInput.slice(0, -1);
-            document.getElementById('dialed-display').innerText = currentInput;
-        }));
-        
-        keypad.appendChild(createKeyElement(allNumbers[9]));
-
-        keypad.appendChild(createActionButton("📞", "key-call", handleCall));
-    }
-
-    function createKeyElement(char) {
-        const div = document.createElement('div');
-        div.className = 'key';
-        div.innerHTML = `<span class="hanzi">${char.h}</span>
-                         <span class="pinyin-zhuyin">${char.z}<br>${char.p}</span>`;
-        div.onclick = () => {
-            if(currentInput.length < 12) {
-                currentInput += char.v;
-                document.getElementById('dialed-display').innerText = currentInput;
-                speak(char.h);
-            }
-        };
-        return div;
-    }
-
-    function createActionButton(content, id, callback) {
-        const div = document.createElement('div');
-        div.className = 'key action';
-        div.id = id;
-        div.innerHTML = `<span class="hanzi">${content}</span>`;
-        div.onclick = callback;
-        return div;
-    }
-
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-TW';
-        msg.rate = 0.8; 
-        window.speechSynthesis.speak(msg);
-    }
-
-    // 模擬撥號嘟嘟聲
-    function playBeep(duration) {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
-        osc.frequency.exponentialRampToValueAtTime(480, audioCtx.currentTime + duration);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-    }
-
-    function handleCall() {
-        if(currentInput === "") return;
-        
-        const overlay = document.getElementById('overlay');
-        const statusText = document.getElementById('status-text');
-        overlay.style.display = 'flex';
-        statusText.innerText = "撥號中...";
-
-        // 撥號循環音 (嘟... 嘟...)
-        let count = 0;
-        const beepInterval = setInterval(() => {
-            playBeep(0.8);
-            count++;
-            if(count >= 3) {
-                clearInterval(beepInterval);
-                checkResult();
-            }
-        }, 1200);
-
-        function checkResult() {
-            if(currentInput === targetNum) {
-                speak("喂，你好");
-                statusText.innerHTML = "成功！<br>「喂，你好！」<br>(Wèi, nǐ hǎo)";
-            } else {
-                speak("您撥的號碼是空號");
-                statusText.innerHTML = "失敗！<br>「您撥的號碼是空號。」<br>(Kōng hào)";
-            }
-        }
-    }
-
-    startGame();
-</script>
-
-</body>
-</html>
