@@ -14,14 +14,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
             background-color: var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+            touch-action: manipulation;
         }
 
         #phone-container {
@@ -38,7 +38,7 @@
         #screen {
             background-color: var(--accent-color);
             border-radius: 20px;
-            height: 180px;
+            height: 220px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
@@ -48,17 +48,30 @@
             text-align: center;
         }
 
-        #target-info {
-            font-size: 1.2rem;
+        #role-icon {
+            font-size: 4rem; /* 放大人物圖示 */
             margin-bottom: 5px;
+        }
+
+        #target-info {
+            font-size: 1rem;
             color: #333;
         }
 
+        .ruby-text {
+            display: inline-block;
+            text-align: center;
+            margin: 0 2px;
+        }
+        .ruby-main { display: block; font-size: 1.2rem; font-weight: bold; }
+        .ruby-sub { display: block; font-size: 0.7rem; color: #555; }
+
         #target-number {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
             letter-spacing: 2px;
             color: #222;
+            margin-top: 5px;
         }
 
         #dialed-display {
@@ -67,6 +80,9 @@
             min-height: 2.2rem;
             margin-top: 10px;
             font-weight: bold;
+            background: rgba(255,255,255,0.5);
+            width: 90%;
+            border-radius: 10px;
         }
 
         /* 按鍵區 */
@@ -85,8 +101,9 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
+            transition: transform 0.1s;
             box-shadow: 0 4px 0 #ddd;
+            user-select: none;
         }
 
         .key:active {
@@ -95,33 +112,38 @@
         }
 
         .key .hanzi { font-size: 1.6rem; font-weight: bold; }
-        .key .pinyin-zhuyin { font-size: 0.7rem; color: #666; }
+        .key .pinyin-zhuyin { font-size: 0.7rem; color: #666; margin-top: 2px; }
 
-        .key.action { color: white; }
+        .key.action { color: white; font-size: 2rem; }
         #key-delete { background-color: #FF9F43; }
         #key-call { background-color: #2ECC71; }
 
-        /* 覆蓋層 (遊戲結束) */
+        /* 覆蓋層 */
         #overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             border-radius: 35px;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
+            text-align: center;
+            padding: 20px;
         }
 
+        #status-text { font-size: 1.5rem; margin-bottom: 20px; color: #333; }
+
         button#retry-btn {
-            padding: 15px 30px;
+            padding: 15px 40px;
             font-size: 1.2rem;
             background-color: var(--secondary-color);
             border: none;
-            border-radius: 10px;
+            border-radius: 50px;
             color: white;
             cursor: pointer;
+            box-shadow: 0 4px 0 #3bb4ac;
         }
     </style>
 </head>
@@ -129,17 +151,21 @@
 
 <div id="phone-container">
     <div id="screen">
-        <div id="target-info">請撥號給 <span id="target-name">...</span></div>
+        <div id="role-icon">👤</div>
+        <div id="target-info">
+            <div class="ruby-text"><span class="ruby-main">打</span><span class="ruby-sub">dǎ/ㄉㄚˇ</span></div>
+            <div class="ruby-text"><span class="ruby-main">給</span><span class="ruby-sub">gěi/ㄍㄟˇ</span></div>
+            <span id="target-name-container"></span>
+        </div>
         <div id="target-number">0000000</div>
         <div id="dialed-display"></div>
     </div>
 
-    <div id="keypad">
-        </div>
+    <div id="keypad"></div>
 
     <div id="overlay">
-        <h2 id="status-text">喂，你好！</h2>
-        <button id="retry-btn" onclick="startGame()">再一次</button>
+        <h2 id="status-text">...</h2>
+        <button id="retry-btn" onclick="startGame()">再一次 (Zài yī cì)</button>
     </div>
 </div>
 
@@ -158,25 +184,32 @@
     ];
 
     const roles = [
-        {name: "爸爸 👨‍💼"}, {name: "媽媽 👩‍🍳"}, {name: "老師 👩‍🏫"}, 
-        {name: "奶奶 👵"}, {name: "警察局 👮"}, {name: "消防隊 👨‍🚒"}
+        {name: "爸爸", p: "bàba", z: "ㄅㄚˋ˙ㄅㄚ", icon: "👨‍💼"},
+        {name: "媽媽", p: "māma", z: "ㄇㄚㄇㄚ", icon: "👩‍🍳"},
+        {name: "老師", p: "lǎoshī", z: "ㄌㄠˇㄕ", icon: "👩‍🏫"},
+        {name: "奶奶", p: "nǎinai", z: "ㄋㄞˇㄋㄞ", icon: "👵"},
+        {name: "警察", p: "jǐngchá", z: "ㄐㄧㄥˇㄔㄚˊ", icon: "👮"},
+        {name: "醫生", p: "yīshēng", z: "ㄧㄕㄥ", icon: "👨‍⚕️"}
     ];
 
     let targetNum = "";
     let currentInput = "";
+    let audioCtx = null;
 
     function startGame() {
         currentInput = "";
         document.getElementById('dialed-display').innerText = "";
         document.getElementById('overlay').style.display = 'none';
         
-        // 隨機角色與號碼 (7-10位)
         const role = roles[Math.floor(Math.random() * roles.length)];
         const len = Math.floor(Math.random() * 4) + 7;
         targetNum = "";
         for(let i=0; i<len; i++) targetNum += Math.floor(Math.random()*10);
 
-        document.getElementById('target-name').innerText = role.name;
+        document.getElementById('role-icon').innerText = role.icon;
+        document.getElementById('target-name-container').innerHTML = `
+            <div class="ruby-text"><span class="ruby-main">${role.name}</span><span class="ruby-sub">${role.p}/${role.z}</span></div>
+        `;
         document.getElementById('target-number').innerText = targetNum;
 
         renderKeypad();
@@ -186,34 +219,30 @@
         const keypad = document.getElementById('keypad');
         keypad.innerHTML = "";
 
-        // 洗牌數字 (0-9)
-        let nums = [...characters].sort(() => Math.random() - 0.5);
-        
-        // 為了佈局美觀，我們將數字拆解填入 3x4 網格
-        // 最後一列固定：刪除 | 0 | 撥打
-        const zeroIndex = nums.findIndex(n => n.v === 0);
-        const zeroChar = nums.splice(zeroIndex, 1)[0];
+        // 0-9 全部參與隨機排列
+        let allNumbers = [...characters].sort(() => Math.random() - 0.5);
 
-        nums.forEach(char => {
-            keypad.appendChild(createKeyElement(char));
-        });
+        // 前 9 個放進格子
+        for(let i=0; i<9; i++) {
+            keypad.appendChild(createKeyElement(allNumbers[i]));
+        }
 
-        // 加入底層按鍵
-        keypad.appendChild(createActionButton("重填", "key-delete", () => {
-            currentInput = "";
-            document.getElementById('dialed-display').innerText = "";
+        // 最後一列：刪除(←) | 第10個隨機數字 | 通話(📞)
+        keypad.appendChild(createActionButton("←", "key-delete", () => {
+            currentInput = currentInput.slice(0, -1);
+            document.getElementById('dialed-display').innerText = currentInput;
         }));
         
-        keypad.appendChild(createKeyElement(zeroChar));
+        keypad.appendChild(createKeyElement(allNumbers[9]));
 
-        keypad.appendChild(createActionButton("通話", "key-call", handleCall));
+        keypad.appendChild(createActionButton("📞", "key-call", handleCall));
     }
 
     function createKeyElement(char) {
         const div = document.createElement('div');
         div.className = 'key';
         div.innerHTML = `<span class="hanzi">${char.h}</span>
-                         <span class="pinyin-zhuyin">${char.z} ${char.p}</span>`;
+                         <span class="pinyin-zhuyin">${char.z}<br>${char.p}</span>`;
         div.onclick = () => {
             if(currentInput.length < 12) {
                 currentInput += char.v;
@@ -224,19 +253,37 @@
         return div;
     }
 
-    function createActionButton(text, id, callback) {
+    function createActionButton(content, id, callback) {
         const div = document.createElement('div');
         div.className = 'key action';
         div.id = id;
-        div.innerHTML = `<span class="hanzi">${text}</span>`;
+        div.innerHTML = `<span class="hanzi">${content}</span>`;
         div.onclick = callback;
         return div;
     }
 
     function speak(text) {
+        window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'zh-TW';
+        msg.rate = 0.8; 
         window.speechSynthesis.speak(msg);
+    }
+
+    // 模擬撥號嘟嘟聲
+    function playBeep(duration) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+        osc.frequency.exponentialRampToValueAtTime(480, audioCtx.currentTime + duration);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
     }
 
     function handleCall() {
@@ -245,20 +292,30 @@
         const overlay = document.getElementById('overlay');
         const statusText = document.getElementById('status-text');
         overlay.style.display = 'flex';
-        statusText.innerText = "撥號中...嘟...嘟...";
+        statusText.innerText = "撥號中...";
 
-        setTimeout(() => {
-            if(currentInput === targetNum) {
-                speak("喂，你好！");
-                statusText.innerText = "成功接通！\n「喂，你好！」";
-            } else {
-                speak("您撥的號碼是空號。");
-                statusText.innerText = "失敗！\n「您撥的號碼是空號。」";
+        // 撥號循環音 (嘟... 嘟...)
+        let count = 0;
+        const beepInterval = setInterval(() => {
+            playBeep(0.8);
+            count++;
+            if(count >= 3) {
+                clearInterval(beepInterval);
+                checkResult();
             }
-        }, 2000);
+        }, 1200);
+
+        function checkResult() {
+            if(currentInput === targetNum) {
+                speak("喂，你好");
+                statusText.innerHTML = "成功！<br>「喂，你好！」<br>(Wèi, nǐ hǎo)";
+            } else {
+                speak("您撥的號碼是空號");
+                statusText.innerHTML = "失敗！<br>「您撥的號碼是空號。」<br>(Kōng hào)";
+            }
+        }
     }
 
-    // 初始化遊戲
     startGame();
 </script>
 
