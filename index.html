@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALL ME PLZ! - 8-Bit Adventure</title>
+    <title>CALL ME PLZ! - 8-Bit Adventure (Special Edition)</title>
     <style>
         :root {
             --pixel-black: #212121;
             --pixel-white: #ffffff;
             --bg-sky: #a2d2ff;
             --phone-case: #4a4e69;
-            --accent-red: #ff595e;
+            --accent-red: #d90429;
             --bubble-friend: #e9e9eb;
             --bubble-me: #34c759;
         }
@@ -49,6 +49,14 @@
         }
         .active { display: flex; }
 
+        /* 警報閃爍動畫 */
+        @keyframes emergency-blink {
+            0% { background-color: #ff4d4d; }
+            50% { background-color: #4d4dff; }
+            100% { background-color: #ff4d4d; }
+        }
+        .emergency-mode { animation: emergency-blink 0.4s infinite; color: white !important; }
+
         .logo { font-size: 2.8rem; color: #ff9f1c; text-shadow: 4px 4px 0 var(--pixel-black); margin-bottom: 30px; }
         
         .btn-pixel {
@@ -58,30 +66,31 @@
         }
         .btn-pixel:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--pixel-black); }
 
-        /* 顏色選擇器 */
         .color-row { display: flex; gap: 15px; margin: 20px 0; }
         .color-opt { width: 45px; height: 45px; border-radius: 50%; border: 4px solid var(--pixel-black); cursor: pointer; }
 
-        /* 對話框樣式 */
-        #chat-container { width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px; overflow-y: auto; }
+        #chat-container { 
+            width: 100%; display: flex; flex-direction: column; gap: 12px; padding: 10px; 
+            justify-content: center; height: 70%; 
+        }
         .msg {
-            padding: 10px 15px; border-radius: 18px; max-width: 80%; font-size: 1.1rem;
-            opacity: 0; transform: translateY(10px); transition: 0.3s all; border: 2px solid var(--pixel-black);
+            padding: 10px 15px; border-radius: 18px; max-width: 85%; font-size: 1.2rem;
+            opacity: 0; transform: translateY(15px); transition: 0.4s all; border: 3px solid var(--pixel-black);
         }
         .msg.friend { background: var(--bubble-friend); align-self: flex-start; }
         .msg.me { background: var(--bubble-me); color: white; align-self: flex-end; }
         .msg.show { opacity: 1; transform: translateY(0); }
 
-        #chat-options { display: none; gap: 10px; margin-top: 20px; }
+        #chat-options { display: none; gap: 10px; margin-top: 10px; z-index: 10; }
 
-        /* 導覽列 */
         #nav-bar {
             width: 100%; height: 60px; padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.05); border-bottom: 3px solid var(--pixel-black);
         }
 
-        /* 數字鍵盤 */
+        #target-num-display { font-size: 2.6rem; color: var(--accent-red); letter-spacing: 4px; margin: 5px 0; }
+
         #keypad {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 12px; width: 100%; padding: 15px; background: #eee;
@@ -101,7 +110,6 @@
         .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
         .medal-slot { opacity: 0.2; filter: grayscale(1); transition: 0.3s; text-align: center; }
         .medal-slot.active { opacity: 1; filter: grayscale(0); }
-        .medal-slot:hover { transform: scale(1.15); }
     </style>
 </head>
 <body class="case-black">
@@ -117,8 +125,8 @@
 
             <div id="sc-setup" class="scene">
                 <p style="font-size: 1.4rem;">你的名字：</p>
-                <input type="text" id="in-name" style="width: 80%; padding: 10px; border: 4px solid #000; text-align: center;" placeholder="小玩家">
-                <p style="font-size: 1.4rem;">顏色</p>
+                <input type="text" id="in-name" style="width: 85%; padding: 12px; border: 4px solid #000; text-align: center; font-size: 1.2rem;" placeholder="小玩家">
+                <p style="font-size: 1.4rem; margin-top:20px;">顏色</p>
                 <div class="color-row">
                     <div class="color-opt" style="background:#333" onclick="setCase('black')"></div>
                     <div class="color-opt" style="background:#ffafcc" onclick="setCase('pink')"></div>
@@ -128,11 +136,11 @@
                 <button class="btn-pixel" onclick="goStory()">GO</button>
             </div>
 
-            <div id="sc-story" class="scene" style="justify-content: flex-start; padding-top: 30px;">
+            <div id="sc-story" class="scene">
                 <div id="chat-container"></div>
                 <div id="chat-options">
-                    <button class="btn-pixel" style="font-size: 1rem;" onclick="reply('ok')">好啊</button>
-                    <button class="btn-pixel" style="font-size: 1rem; background: #ddd;" onclick="reply('no')">不要</button>
+                    <button class="btn-pixel" style="font-size: 1.1rem;" onclick="reply('ok')">好啊</button>
+                    <button class="btn-pixel" style="font-size: 1.1rem; background: #ddd;" onclick="reply('no')">不要</button>
                 </div>
             </div>
 
@@ -143,19 +151,21 @@
                     <div style="font-size: 1.5rem; cursor:pointer;" onclick="resetGame()">🚪</div>
                 </div>
                 <div id="role-icon" style="font-size: 4.5rem; margin-top: 10px;">👤</div>
-                <div id="ui-target-name" style="font-size: 1.5rem; margin: 5px 0;">打給...</div>
-                <div id="target-num-display" style="font-size: 2.2rem; color: var(--accent-red); letter-spacing: 3px;">--------</div>
-                <div id="dial-input-area" style="font-size: 1.8rem; margin: 15px 0; border-bottom: 4px dashed #ccc; width: 90%; min-height: 2.5rem;"></div>
+                <div id="ui-target-name" style="font-size: 1.4rem; margin: 5px 0;">打給...</div>
+                <div id="target-num-display">--------</div>
+                <div id="dial-input-area" style="font-size: 1.8rem; margin: 10px 0; border-bottom: 4px dashed #ccc; width: 90%; min-height: 2.5rem;"></div>
                 <div id="keypad"></div>
             </div>
 
             <div id="sc-calling" class="scene" style="background:#212121; color:white;">
-                <div style="font-size: 5rem;">📞</div><h2 class="calling-anim">撥號中...</h2>
+                <div style="font-size: 5rem;">📞</div><h2 style="letter-spacing:2px;">撥號中...</h2>
             </div>
+
             <div id="sc-result" class="scene">
                 <div id="res-icon" style="font-size: 5rem;"></div>
-                <h1 id="res-title"></h1><p id="res-msg"></p>
-                <button id="res-btn" class="btn-pixel" onclick="startGame()">下一題</button>
+                <h1 id="res-title" style="margin:10px 0;"></h1>
+                <p id="res-msg" style="font-size: 1.4rem;"></p>
+                <button id="res-btn" class="btn-pixel" onclick="startGame()">NEXT</button>
                 <button id="fail-btn" class="btn-pixel" style="display:none;" onclick="resetGame()">回首頁</button>
             </div>
 
@@ -170,10 +180,9 @@
 </div>
 
 <script>
-    // --- 角色與數字資料 (同前版本) ---
     const roles = [
-        { id: 0, n: "警察局", i: "👮", num: "110", zy: "ㄐㄧㄥˇ ㄔㄚˊ ㄐㄩˊ" },
-        { id: 1, n: "消防局", i: "👨‍🚒", num: "119", zy: "ㄒㄧㄠ ㄈㄤˊ ㄐㄩˊ" },
+        { id: 0, n: "警察局", i: "👮", num: "110", zy: "ㄐㄧㄥˇ ㄔㄚˊ ㄐㄩˊ", type: "emergency" },
+        { id: 1, n: "消防局", i: "👨‍🚒", num: "119", zy: "ㄒㄧㄠ ㄈㄤˊ ㄐㄩˊ", type: "emergency" },
         { id: 2, n: "爸爸", i: "👨‍💼", zy: "ㄅㄚˋ ㄅㄚ˙" },
         { id: 3, n: "媽媽", i: "👩‍🍳", zy: "ㄇㄚ ㄇㄚ" },
         { id: 4, n: "老師", i: "👩‍🏫", zy: "ㄌㄠˇ ㄕ" },
@@ -194,45 +203,59 @@
         {zh: '八', v: 8, z: 'ㄅㄚ'}, {zh: '九', v: 9, z: 'ㄐㄧㄡˇ'}
     ];
 
-    let state = { name: "", lives: 3, collected: new Set(), target: null, targetNum: "", input: "" };
-    let audioCtx, bgmInterval;
+    let state = { name: "玩家", lives: 3, collected: new Set(), target: null, targetNum: "", input: "", bgmRunning: false };
+    let audioCtx;
 
-    // --- 活潑的 8-Bit BGM 引擎 ---
+    // --- 音長變化 BGM 樂譜 ---
+    const score = [
+        { f: 523, d: 200 }, { f: 523, d: 200 }, { f: 587, d: 400 }, { f: 659, d: 400 }, { f: 523, d: 400 }, 
+        { f: 659, d: 200 }, { f: 587, d: 600 }, { f: 392, d: 800 }, 
+        { f: 440, d: 200 }, { f: 392, d: 200 }, { f: 440, d: 200 }, { f: 523, d: 400 }, { f: 587, d: 800 }
+    ];
+    let noteIdx = 0;
+
     function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
-    function playBGM() {
-        if (bgmInterval) return;
-        const melody = [
-            // 第一句 (A)
-            523, 523, 587, 659, 523, 659, 587, 392, 440, 392, 440, 523, 
-            // 第二句 (B)
-            659, 659, 698, 783, 659, 783, 698, 523, 587, 523, 587, 659,
-            // 第三句 (C)
-            783, 880, 783, 659, 523, 659, 587, 392, 440, 523, 587, 523
-        ];
-        let step = 0;
-        bgmInterval = setInterval(() => {
-            if (audioCtx.state === 'running') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(melody[step % melody.length], audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-                step++;
-            }
-        }, 250); 
+    function playNextNote() {
+        if (!state.bgmRunning || audioCtx.state !== 'running') return;
+        const note = score[noteIdx % score.length];
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(note.f, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (note.d / 1000));
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + (note.d / 1000));
+        noteIdx++;
+        setTimeout(playNextNote, note.d);
     }
 
-    // --- 簡訊邏輯 ---
+    // --- 特殊音效：警報聲 ---
+    function playSiren() {
+        const sirenLength = 2.0;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(880, now + 0.5);
+        osc.frequency.linearRampToValueAtTime(440, now + 1.0);
+        osc.frequency.linearRampToValueAtTime(880, now + 1.5);
+        osc.frequency.linearRampToValueAtTime(440, now + 2.0);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + sirenLength);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(now + sirenLength);
+    }
+
+    // --- 對話與遊戲核心 ---
     function goStory() {
-        state.name = document.getElementById('in-name').value || "小玩家";
+        state.name = document.getElementById('in-name').value || "玩家";
         switchScene('sc-story');
         const chat = document.getElementById('chat-container');
         chat.innerHTML = "";
-        const lines = ["救命啊！😱", "我忘記帶手機了...", "請幫我打電話"];
+        const lines = [`${state.name}！救命啊！😱`, "我忘記帶手機了...", "請幫我打電話"];
         lines.forEach((l, i) => {
             setTimeout(() => {
                 const b = document.createElement('div');
@@ -249,21 +272,22 @@
         const b = document.createElement('div');
         b.className = 'msg me';
         if(type === 'ok') {
-            b.innerText = "好啊！"; chat.appendChild(b);
+            b.innerText = "好啊！沒問題"; chat.appendChild(b);
             setTimeout(() => b.classList.add('show'), 50);
             setTimeout(startGame, 1000);
         } else {
-            b.innerText = "不要。"; chat.appendChild(b);
+            b.innerText = "我有事，不要。"; chat.appendChild(b);
             setTimeout(() => b.classList.add('show'), 50);
             setTimeout(resetGame, 1000);
         }
         document.getElementById('chat-options').style.display = 'none';
     }
 
-    // --- 核心遊戲與 UI (維持定案邏輯) ---
     function switchScene(id) {
         document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        const scene = document.getElementById(id);
+        scene.classList.add('active');
+        scene.classList.remove('emergency-mode'); // 預設移除閃爍
     }
 
     function startGame() {
@@ -309,24 +333,42 @@
 
     function showResult() {
         const win = state.input === state.targetNum;
+        const resultScene = document.getElementById('sc-result');
         switchScene('sc-result');
         const icon = document.getElementById('res-icon');
         const title = document.getElementById('res-title');
         const msg = document.getElementById('res-msg');
+
         if(win) {
-            icon.innerText = "🎉"; title.innerText = "成功接通！"; msg.innerText = "「喂，你好！」";
-            state.collected.add(state.target.id); speak("喂，你好", () => setTimeout(openMedals, 500));
+            icon.innerText = "🎉"; title.innerText = "成功通話！"; 
+            state.collected.add(state.target.id);
+            
+            // 🚨 彩蛋檢查：緊急號碼
+            if(state.target.type === "emergency") {
+                resultScene.classList.add('emergency-mode');
+                playSiren();
+                msg.innerText = `這是緊急專線 ${state.target.num}！`;
+                speak(`${state.target.n}你好，需要什麼幫助嗎？`, () => setTimeout(openMedals, 1000));
+            } else {
+                msg.innerText = "「喂，你好！」";
+                speak("喂，你好", () => setTimeout(openMedals, 500));
+            }
+            
             document.getElementById('res-btn').style.display = "block"; document.getElementById('fail-btn').style.display = "none";
         } else {
             icon.innerText = "😵"; title.innerText = "打錯了！"; msg.innerText = "您撥的號碼是空號";
             state.lives--; speak("您撥的號碼是空號");
-            if(state.lives <= 0) { title.innerText = "挑戰失敗"; document.getElementById('res-btn').style.display = "none"; document.getElementById('fail-btn').style.display = "block"; }
+            if(state.lives <= 0) { title.innerText = "遊戲結束"; document.getElementById('res-btn').style.display = "none"; document.getElementById('fail-btn').style.display = "block"; }
             else { document.getElementById('res-btn').style.display = "block"; document.getElementById('fail-btn').style.display = "none"; }
         }
         updateUI(); audioCtx.resume();
     }
 
-    function goSetup() { initAudio(); playBGM(); switchScene('sc-setup'); }
+    function goSetup() { 
+        initAudio(); 
+        if(!state.bgmRunning) { state.bgmRunning = true; playNextNote(); }
+        switchScene('sc-setup'); 
+    }
     function setCase(c) { document.body.className = `case-${c}`; }
     function updateUI() { document.getElementById('ui-hearts').innerText = "❤️".repeat(state.lives); }
     function openMedals() {
