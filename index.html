@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALL ME PLZ! - 8-Bit Adventure (Special Edition)</title>
+    <title>CALL ME PLZ! - 8-Bit Adventure (Final Edition)</title>
     <style>
         :root {
             --pixel-black: #212121;
@@ -49,7 +49,6 @@
         }
         .active { display: flex; }
 
-        /* 警報閃爍動畫 */
         @keyframes emergency-blink {
             0% { background-color: #ff4d4d; }
             50% { background-color: #4d4dff; }
@@ -98,7 +97,7 @@
         .digit-key {
             background: white; border: 4px solid var(--pixel-black); border-radius: 15px;
             height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 4px 4px 0 var(--pixel-black);
+            cursor: pointer; box-shadow: 4px 4px 0 var(--pixel-black); transition: 0.1s;
         }
         .digit-key:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pixel-black); }
 
@@ -107,9 +106,15 @@
             background: rgba(255,255,255,0.98); z-index: 200;
             display: none; flex-direction: column; align-items: center; padding: 20px;
         }
-        .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
-        .medal-slot { opacity: 0.2; filter: grayscale(1); transition: 0.3s; text-align: center; }
-        .medal-slot.active { opacity: 1; filter: grayscale(0); }
+        .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; overflow-y: auto; }
+        
+        /* 修正獎牌放大反饋 */
+        .medal-slot { 
+            opacity: 0.2; filter: grayscale(1); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            text-align: center; cursor: default;
+        }
+        .medal-slot.active { opacity: 1; filter: grayscale(0); cursor: pointer; }
+        .medal-slot:hover { transform: scale(1.15); }
     </style>
 </head>
 <body class="case-black">
@@ -206,16 +211,38 @@
     let state = { name: "玩家", lives: 3, collected: new Set(), target: null, targetNum: "", input: "", bgmRunning: false };
     let audioCtx;
 
-    // --- 音長變化 BGM 樂譜 ---
+    // --- 音效系統 ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function playClickSound() {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playBubbleSound() {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // --- BGM 引擎 ---
     const score = [
         { f: 523, d: 200 }, { f: 523, d: 200 }, { f: 587, d: 400 }, { f: 659, d: 400 }, { f: 523, d: 400 }, 
         { f: 659, d: 200 }, { f: 587, d: 600 }, { f: 392, d: 800 }, 
         { f: 440, d: 200 }, { f: 392, d: 200 }, { f: 440, d: 200 }, { f: 523, d: 400 }, { f: 587, d: 800 }
     ];
     let noteIdx = 0;
-
-    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-
     function playNextNote() {
         if (!state.bgmRunning || audioCtx.state !== 'running') return;
         const note = score[noteIdx % score.length];
@@ -231,9 +258,7 @@
         setTimeout(playNextNote, note.d);
     }
 
-    // --- 特殊音效：警報聲 ---
     function playSiren() {
-        const sirenLength = 2.0;
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -242,15 +267,14 @@
         osc.frequency.linearRampToValueAtTime(880, now + 0.5);
         osc.frequency.linearRampToValueAtTime(440, now + 1.0);
         osc.frequency.linearRampToValueAtTime(880, now + 1.5);
-        osc.frequency.linearRampToValueAtTime(440, now + 2.0);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + sirenLength);
+        gain.gain.setValueAtTime(0.08, now);
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(now + sirenLength);
+        osc.start(); osc.stop(now + 1.6);
     }
 
-    // --- 對話與遊戲核心 ---
+    // --- 簡訊邏輯 ---
     function goStory() {
+        playClickSound();
         state.name = document.getElementById('in-name').value || "玩家";
         switchScene('sc-story');
         const chat = document.getElementById('chat-container');
@@ -261,6 +285,7 @@
                 const b = document.createElement('div');
                 b.className = 'msg friend'; b.innerText = l;
                 chat.appendChild(b);
+                playBubbleSound();
                 setTimeout(() => b.classList.add('show'), 50);
                 if(i === lines.length-1) document.getElementById('chat-options').style.display = 'flex';
             }, i * 1200);
@@ -268,29 +293,34 @@
     }
 
     function reply(type) {
+        playClickSound();
         const chat = document.getElementById('chat-container');
         const b = document.createElement('div');
         b.className = 'msg me';
         if(type === 'ok') {
             b.innerText = "好啊！沒問題"; chat.appendChild(b);
+            playBubbleSound();
             setTimeout(() => b.classList.add('show'), 50);
             setTimeout(startGame, 1000);
         } else {
             b.innerText = "我有事，不要。"; chat.appendChild(b);
+            playBubbleSound();
             setTimeout(() => b.classList.add('show'), 50);
             setTimeout(resetGame, 1000);
         }
         document.getElementById('chat-options').style.display = 'none';
     }
 
+    // --- 遊戲核心 ---
     function switchScene(id) {
         document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
         const scene = document.getElementById(id);
         scene.classList.add('active');
-        scene.classList.remove('emergency-mode'); // 預設移除閃爍
+        scene.classList.remove('emergency-mode');
     }
 
     function startGame() {
+        playClickSound();
         state.input = ""; document.getElementById('dial-input-area').innerText = "";
         let pool = roles.filter(r => !state.collected.has(r.id));
         if (pool.length === 0) pool = roles;
@@ -306,7 +336,7 @@
         const pad = document.getElementById('keypad'); pad.innerHTML = "";
         let shuffled = [...numsData].sort(() => Math.random() - 0.5);
         shuffled.slice(0, 9).forEach(n => pad.appendChild(makeKey(n)));
-        pad.appendChild(makeAction("←", "#ffab91", () => { state.input = state.input.slice(0, -1); document.getElementById('dial-input-area').innerText = state.input; }));
+        pad.appendChild(makeAction("←", "#ffab91", () => { playClickSound(); state.input = state.input.slice(0, -1); document.getElementById('dial-input-area').innerText = state.input; }));
         pad.appendChild(makeKey(shuffled[9]));
         pad.appendChild(makeAction("📞", "#8ac926", handleCall));
     }
@@ -314,7 +344,7 @@
     function makeKey(n) {
         const d = document.createElement('div'); d.className = 'digit-key';
         d.innerHTML = `<span style="font-size:1.6rem">${n.zh}</span><span style="font-size:0.6rem; color:#777">${n.z}</span>`;
-        d.onclick = () => { if(state.input.length < 12) { state.input += n.v; document.getElementById('dial-input-area').innerText = state.input; speak(n.zh); } };
+        d.onclick = () => { if(state.input.length < 12) { playClickSound(); state.input += n.v; document.getElementById('dial-input-area').innerText = state.input; speak(n.zh); } };
         return d;
     }
 
@@ -326,6 +356,7 @@
 
     function handleCall() {
         if(!state.input) return;
+        playClickSound();
         audioCtx.suspend(); switchScene('sc-calling');
         let count = 0;
         const timer = setInterval(() => { playBeep(440, 0.5); count++; if(count >= 3) { clearInterval(timer); showResult(); } }, 1000);
@@ -342,18 +373,14 @@
         if(win) {
             icon.innerText = "🎉"; title.innerText = "成功通話！"; 
             state.collected.add(state.target.id);
-            
-            // 🚨 彩蛋檢查：緊急號碼
             if(state.target.type === "emergency") {
-                resultScene.classList.add('emergency-mode');
-                playSiren();
+                resultScene.classList.add('emergency-mode'); playSiren();
                 msg.innerText = `這是緊急專線 ${state.target.num}！`;
-                speak(`${state.target.n}你好，需要什麼幫助嗎？`, () => setTimeout(openMedals, 1000));
+                speak(`${state.target.n}你好，需要協助嗎？`, () => setTimeout(openMedals, 1500));
             } else {
                 msg.innerText = "「喂，你好！」";
-                speak("喂，你好", () => setTimeout(openMedals, 500));
+                speak("喂，你好", () => setTimeout(openMedals, 800));
             }
-            
             document.getElementById('res-btn').style.display = "block"; document.getElementById('fail-btn').style.display = "none";
         } else {
             icon.innerText = "😵"; title.innerText = "打錯了！"; msg.innerText = "您撥的號碼是空號";
@@ -365,11 +392,11 @@
     }
 
     function goSetup() { 
-        initAudio(); 
+        initAudio(); playClickSound();
         if(!state.bgmRunning) { state.bgmRunning = true; playNextNote(); }
         switchScene('sc-setup'); 
     }
-    function setCase(c) { document.body.className = `case-${c}`; }
+    function setCase(c) { playClickSound(); document.body.className = `case-${c}`; }
     function updateUI() { document.getElementById('ui-hearts').innerText = "❤️".repeat(state.lives); }
     function openMedals() {
         const grid = document.getElementById('ui-medal-grid'); grid.innerHTML = "";
@@ -380,8 +407,8 @@
         });
         document.getElementById('medal-modal').style.display = 'flex';
     }
-    function closeMedals() { document.getElementById('medal-modal').style.display = 'none'; }
-    function resetGame() { state.lives = 3; state.collected.clear(); switchScene('sc-home'); }
+    function closeMedals() { playClickSound(); document.getElementById('medal-modal').style.display = 'none'; }
+    function resetGame() { playClickSound(); state.lives = 3; state.collected.clear(); switchScene('sc-home'); }
     function speak(t, cb) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'zh-TW'; if(cb) u.onend = cb; window.speechSynthesis.speak(u); }
     function playBeep(f, d) { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value = f; g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d); o.start(); o.stop(audioCtx.currentTime + d); }
 </script>
