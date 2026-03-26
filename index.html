@@ -3,79 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小小接線生 8-Bit Adventure</title>
+    <title>CALL ME PLZ! </title>
     <style>
-        /* 載入像素風格字體 (備援) */
-        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
-
         :root {
             --pixel-black: #212121;
             --pixel-white: #ffffff;
-            --bg-color: #a2d2ff;
-            --phone-color: #4a4e69;
-            --accent: #ff006e;
-            --screen-bg: #caf0f8;
+            --bg-sky: #a2d2ff;
+            --phone-case: #4a4e69;
+            --accent-red: #ff595e;
+            --accent-green: #8ac926;
+            --bubble-friend: #f1f1f1;
+            --text-color: #2b2d42;
         }
 
-        /* 手機殼配色 */
-        .case-black { --phone-color: #3d3d3d; --accent: #00b4d8; }
-        .case-pink { --phone-color: #ffafcc; --accent: #fb6f92; }
-        .case-green { --phone-color: #b7e4c7; --accent: #52b788; }
-        .case-yellow { --phone-color: #ffee93; --accent: #f9a825; }
+        /* 顏色套件 */
+        .case-black { --phone-case: #333533; --accent-btn: #4cc9f0; }
+        .case-pink { --phone-case: #ffafcc; --accent-btn: #ff0a54; }
+        .case-green { --phone-case: #b7e4c7; --accent-btn: #2d6a4f; }
+        .case-yellow { --phone-case: #fee440; --accent-btn: #f95738; }
 
-        * { box-sizing: border-box; font-family: 'ZCOOL KuaiLe', cursive, sans-serif; }
+        * { 
+            box-sizing: border-box; 
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; 
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            background-color: var(--bg-color);
-            background-image: radial-gradient(var(--pixel-white) 10%, transparent 10%);
-            background-size: 20px 20px;
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
+            background-color: var(--bg-sky);
+            background-image: radial-gradient(var(--pixel-white) 15%, transparent 15%);
+            background-size: 30px 30px;
+            margin: 0; display: flex; justify-content: center; align-items: center;
             height: 100vh; width: 100vw; overflow: hidden;
-            touch-action: manipulation;
         }
 
-        /* 遊戲主容器：自適應縮放 */
-        #game-container {
+        /* 遊戲自適應容器 */
+        #game-wrapper {
             position: relative;
+            width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            width: 100%; height: 100%;
-            max-height: 95vh;
         }
 
-        /* 精緻手機外殼 */
-        #phone-shell {
-            width: 340px;
-            height: 90vh;
-            max-height: 700px;
-            background: var(--phone-color);
+        #phone-body {
+            width: 350px; height: 92vh; max-height: 750px;
+            background: var(--phone-case);
             border: 8px solid var(--pixel-black);
-            border-radius: 50px;
+            border-radius: 55px;
             position: relative;
-            box-shadow: 15px 15px 0 rgba(0,0,0,0.2);
-            display: flex; flex-direction: column; align-items: center;
-            padding: 15px;
-            transition: all 0.3s;
+            box-shadow: 12px 12px 0 rgba(0,0,0,0.2);
+            padding: 12px; display: flex; flex-direction: column;
         }
 
-        /* 手機裝飾細節 */
-        #phone-shell::after {
-            content: ''; position: absolute; top: 20px; width: 60px; height: 6px;
-            background: var(--pixel-black); border-radius: 10px;
+        #phone-body::before { /* 聽筒 */
+            content: ''; position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
+            width: 70px; height: 8px; background: var(--pixel-black); border-radius: 10px;
         }
 
-        /* 螢幕區域 */
+        /* 螢幕主區 */
         #screen {
-            width: 100%; height: 100%;
-            background: var(--screen-bg);
+            flex: 1; background: #f8f9fa;
             border: 6px solid var(--pixel-black);
-            border-radius: 30px;
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            position: relative;
+            border-radius: 35px; overflow: hidden;
+            position: relative; display: flex; flex-direction: column;
         }
 
-        /* 介面層級 */
         .scene {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: none; flex-direction: column; align-items: center; justify-content: center;
@@ -83,147 +74,156 @@
         }
         .active { display: flex; }
 
-        /* 8-bit 按鈕風格 */
-        .pixel-btn {
-            background: var(--pixel-white);
-            border: 4px solid var(--pixel-black);
-            box-shadow: 4px 4px 0 var(--pixel-black);
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.1s;
+        /* 標題畫面 */
+        .logo { font-size: 2.8rem; color: #ff9f1c; text-shadow: 4px 4px 0 var(--pixel-black); margin-bottom: 30px; }
+        
+        /* 萬用像素按鈕 */
+        .btn-pixel {
+            background: var(--pixel-white); border: 4px solid var(--pixel-black);
+            box-shadow: 5px 5px 0 var(--pixel-black);
+            padding: 12px 30px; font-size: 1.5rem; cursor: pointer; margin: 10px;
+            transition: 0.1s;
         }
-        .pixel-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--pixel-black); }
+        .btn-pixel:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--pixel-black); }
 
-        /* 初始畫面樣式 */
-        #start-scene { background: #bde0fe; }
-        .logo-box { font-size: 2.5rem; color: var(--accent); text-shadow: 4px 4px 0 #fff; margin-bottom: 20px; }
+        /* 設定頁置中 */
+        .setup-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .setup-input { 
+            width: 85%; padding: 10px; font-size: 1.3rem; border: 4px solid var(--pixel-black); 
+            margin-bottom: 20px; text-align: center;
+        }
+        .color-row { display: flex; gap: 15px; margin-bottom: 25px; }
+        .color-opt { width: 45px; height: 45px; border-radius: 50%; border: 4px solid var(--pixel-black); cursor: pointer; }
 
-        /* 置中設定卡 */
-        .config-card { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .color-picker { display: flex; gap: 10px; margin: 15px 0; }
-        .color-dot { width: 40px; height: 40px; border: 3px solid #000; border-radius: 50%; cursor: pointer; }
+        /* 簡訊對話框樣式 */
+        #chat-container { width: 100%; padding: 10px; display: flex; flex-direction: column; gap: 15px; }
+        .msg-bubble {
+            background: var(--bubble-friend); border: 3px solid var(--pixel-black);
+            padding: 12px; border-radius: 15px; align-self: flex-start;
+            max-width: 85%; font-size: 1.1rem; text-align: left;
+            position: relative; opacity: 0; transform: translateY(10px);
+            transition: 0.4s all;
+        }
+        .msg-bubble.show { opacity: 1; transform: translateY(0); }
 
-        /* 頂部功能條 */
-        #status-bar {
-            width: 100%; padding: 10px 15px;
+        /* 頂部功能列：左紅心、中獎盃、右離開 */
+        #nav-bar {
+            width: 100%; height: 60px; padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
-            position: absolute; top: 0; left: 0; z-index: 50;
+            background: rgba(0,0,0,0.05); border-bottom: 3px solid var(--pixel-black);
         }
-        .heart-life { font-size: 1.2rem; }
-        .exit-btn { font-size: 1.5rem; cursor: pointer; }
+        .nav-item { font-size: 1.5rem; display: flex; align-items: center; cursor: pointer; }
+        .hearts { color: var(--accent-red); letter-spacing: 2px; }
+        .trophy-btn { font-size: 1.8rem; transition: 0.2s; }
+        .trophy-btn:hover { transform: scale(1.2); }
 
-        /* 獎盃大按鈕 */
-        #trophy-btn {
-            position: absolute; bottom: 20px; right: -20px;
-            width: 70px; height: 70px; background: #ffd700;
-            border: 5px solid var(--pixel-black); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; cursor: pointer; z-index: 60;
-            box-shadow: 4px 4px 0 var(--pixel-black);
+        /* 遊戲區域文字放大 */
+        #role-icon { font-size: 4.5rem; margin-top: 10px; }
+        .role-title { font-size: 1.6rem; margin: 10px 0; color: #444; }
+        #target-num-display { font-size: 2.2rem; color: var(--accent-red); letter-spacing: 3px; }
+        #dial-input-area { 
+            font-size: 1.8rem; margin: 15px 0; border-bottom: 4px dashed #ccc; 
+            width: 90%; min-height: 2.5rem; color: var(--pixel-black);
         }
 
-        /* 遊戲內容 */
-        #role-icon { font-size: 4rem; margin-top: 20px; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.1)); }
-        .role-name-box { margin: 10px 0; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 10px; }
-        #target-number { font-size: 1.8rem; font-weight: bold; color: var(--accent); letter-spacing: 2px; }
-        #dial-display { font-size: 1.6rem; height: 2rem; margin-top: 10px; color: #333; font-weight: bold; border-bottom: 3px dashed #999; width: 80%; }
-
-        /* 撥號鍵盤 */
+        /* 撥號盤 */
         #keypad {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 8px; width: 100%; padding: 15px; background: rgba(0,0,0,0.05);
+            gap: 12px; width: 100%; padding: 15px; background: #eee;
         }
-        .key {
-            background: white; border: 3px solid var(--pixel-black); border-radius: 12px;
-            height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 3px 3px 0 var(--pixel-black);
+        .digit-key {
+            background: white; border: 4px solid var(--pixel-black); border-radius: 15px;
+            height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 4px 4px 0 var(--pixel-black);
         }
-        .key:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--pixel-black); }
-        .key-zh { font-size: 1.4rem; font-weight: bold; }
-        .key-py { font-size: 0.6rem; color: #666; }
+        .digit-key:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pixel-black); }
+        .zh-char { font-size: 1.6rem; }
+        .zy-char { font-size: 0.6rem; color: #777; }
 
-        /* 收集冊 */
-        #collection-overlay {
+        /* 收集冊 Modal */
+        #medal-modal {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--screen-bg); z-index: 100; display: none; padding: 20px;
+            background: rgba(255,255,255,0.98); z-index: 200;
+            display: none; flex-direction: column; align-items: center; padding: 20px;
         }
-        .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow-y: auto; height: 80%; }
-        .medal { opacity: 0.2; filter: grayscale(1); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; }
-        .medal.won { opacity: 1; filter: grayscale(0); }
+        .medal-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            overflow-y: auto; width: 100%; padding: 10px;
+        }
+        .medal-slot {
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0.2; filter: grayscale(1); transition: 0.3s;
+        }
+        .medal-slot:hover { transform: scale(1.15); }
+        .medal-slot.active { opacity: 1; filter: grayscale(0); }
+        .medal-icon { font-size: 2.5rem; margin-bottom: 5px; }
 
-        /* 撥號效果 */
-        #calling-scene { background: #333; color: white; }
-        .dot-animation::after { content: '...'; animation: dots 1.5s infinite; }
-        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
-
-        /* 注音標記 */
-        .ruby { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; margin: 0 2px; }
-        .rt { font-size: 0.6rem; color: #555; margin-bottom: 2px; }
+        /* 動畫 */
+        .calling-anim::after { content: ''; animation: callDots 1.5s infinite; }
+        @keyframes callDots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
     </style>
 </head>
 <body class="case-black">
 
-<div id="game-container">
-    <div id="phone-shell">
+<div id="game-wrapper">
+    <div id="phone-body">
         <div id="screen">
             
-            <div id="start-scene" class="scene active">
-                <div class="logo-box">📞小小接線生</div>
-                <button class="pixel-btn" onclick="showConfig()">START</button>
+            <div id="sc-home" class="scene active">
+                <div class="logo">CALL ME PLZ!</div>
+                <button class="btn-pixel" onclick="goSetup()">START</button>
             </div>
 
-            <div id="config-scene" class="scene">
-                <div class="config-card">
-                    <p>你的名字:</p>
-                    <input type="text" id="player-name" style="width: 80%; padding: 8px; border: 3px solid #000;" placeholder="小玩家">
-                    <p>選擇手機顏色:</p>
-                    <div class="color-picker">
-                        <div class="color-dot" style="background:#3d3d3d" onclick="setShell('black')"></div>
-                        <div class="color-dot" style="background:#ffafcc" onclick="setShell('pink')"></div>
-                        <div class="color-dot" style="background:#b7e4c7" onclick="setShell('green')"></div>
-                        <div class="color-dot" style="background:#ffee93" onclick="setShell('yellow')"></div>
+            <div id="sc-setup" class="scene">
+                <div class="setup-container">
+                    <p style="font-size: 1.4rem;">你的名字：</p>
+                    <input type="text" id="in-name" class="setup-input" placeholder="小玩家">
+                    <p style="font-size: 1.4rem;">選手機殼顏色：</p>
+                    <div class="color-row">
+                        <div class="color-opt" style="background:#333" onclick="setCase('black')"></div>
+                        <div class="color-opt" style="background:#ffafcc" onclick="setCase('pink')"></div>
+                        <div class="color-opt" style="background:#b7e4c7" onclick="setCase('green')"></div>
+                        <div class="color-opt" style="background:#fee440" onclick="setCase('yellow')"></div>
                     </div>
-                    <button class="pixel-btn" onclick="startStory()">確定!</button>
+                    <button class="btn-pixel" onclick="goStory()">確定</button>
                 </div>
             </div>
 
-            <div id="story-scene" class="scene" style="background: white;">
-                <p id="story-text" style="line-height: 1.6; padding: 20px;"></p>
-                <button class="pixel-btn" onclick="initGame()">沒問題!</button>
+            <div id="sc-story" class="scene" style="justify-content: flex-start; padding-top: 40px;">
+                <div id="chat-container"></div>
+                <button id="story-next-btn" class="btn-pixel" style="margin-top:auto; display:none;" onclick="startGame()">幫他打電話!</button>
             </div>
 
-            <div id="main-scene" class="scene">
-                <div id="status-bar">
-                    <div id="life-box" class="heart-life">❤️❤️❤️</div>
-                    <div class="exit-btn" onclick="resetGame()">✖️</div>
+            <div id="sc-main" class="scene" style="justify-content: flex-start; padding: 0;">
+                <div id="nav-bar">
+                    <div class="nav-item hearts" id="ui-hearts">❤️❤️❤️</div>
+                    <div class="nav-item trophy-btn" onclick="openMedals()">🏆</div>
+                    <div class="nav-item" onclick="resetGame()">🚪</div>
                 </div>
                 <div id="role-icon">👤</div>
-                <div class="role-name-box" id="target-info"></div>
-                <div id="target-number">--------</div>
-                <div id="dial-display"></div>
-                
+                <div class="role-title" id="ui-target-name"></div>
+                <div id="target-num-display">--------</div>
+                <div id="dial-input-area"></div>
                 <div id="keypad"></div>
-                <div id="trophy-btn" onclick="toggleCollection()">🏆</div>
             </div>
 
-            <div id="calling-scene" class="scene">
+            <div id="sc-calling" class="scene" style="background: #212121; color: white;">
                 <div style="font-size: 5rem;">📞</div>
-                <h2 class="dot-animation">撥號中</h2>
+                <h2 class="calling-anim">正在撥號</h2>
             </div>
 
-            <div id="result-scene" class="scene">
-                <div id="result-icon" style="font-size: 5rem;"></div>
-                <h2 id="result-msg"></h2>
-                <button id="next-btn" class="pixel-btn" onclick="initGame()">下一題</button>
-                <button id="retry-btn" class="pixel-btn" onclick="resetGame()" style="display:none">回首頁</button>
+            <div id="sc-result" class="scene">
+                <div id="res-icon" style="font-size: 5rem;"></div>
+                <h1 id="res-title" style="font-size: 2.2rem;"></h1>
+                <p id="res-msg" style="font-size: 1.3rem;"></p>
+                <button id="res-btn" class="btn-pixel" onclick="startGame()">下一題</button>
+                <button id="fail-btn" class="btn-pixel" style="display:none;" onclick="resetGame()">重來一次</button>
             </div>
 
-            <div id="collection-overlay">
-                <h3>🏆 角色收集冊</h3>
-                <div class="medal-grid" id="medal-list"></div>
-                <button class="pixel-btn" onclick="toggleCollection()">關閉</button>
+            <div id="medal-modal">
+                <h2 style="font-size: 1.8rem; margin-bottom: 20px;">🏆 收集冊</h2>
+                <div class="medal-grid" id="ui-medal-grid"></div>
+                <button class="btn-pixel" onclick="closeMedals()">關閉</button>
             </div>
 
         </div>
@@ -231,260 +231,252 @@
 </div>
 
 <script>
-    // --- 資料定義 ---
+    // --- 遊戲資料 ---
     const roles = [
-        { id: 0, n: "警察局", i: "👮", num: "110", py: "jǐng chájú", zy: "ㄐㄧㄥˇ ㄔㄚˊㄐㄩˊ" },
-        { id: 1, n: "消防局", i: "👨‍🚒", num: "119", py: "xiāo fángjú", zy: "ㄒㄧㄠ ㄈㄤˊㄐㄩˊ" },
-        { id: 2, n: "爸爸", i: "👨‍💼", py: "bà ba", zy: "ㄅㄚˋ ㄅㄚ˙" },
-        { id: 3, n: "媽媽", i: "👩‍🍳", py: "mā ma", zy: "ㄇㄚ ㄇㄚ" },
-        { id: 4, n: "老師", i: "👩‍🏫", py: "lǎo shī", zy: "ㄌㄠˇ ㄕ" },
-        { id: 5, n: "奶奶", i: "👵", py: "nǎi nai", zy: "ㄋㄞˇ ㄋㄞˇ" },
-        { id: 6, n: "爺爺", i: "👴", py: "yé ye", zy: "ㄧㄝˊ ㄧㄝ˙" },
-        { id: 7, n: "哥哥", i: "👦", py: "gē ge", zy: "ㄍㄜ ㄍㄜ" },
-        { id: 8, n: "姐姐", i: "👧", py: "jiě jie", zy: "ㄐㄧㄝˇ ㄐㄧㄝ˙" },
-        { id: 9, n: "弟弟", i: "👶", py: "dì di", zy: "ㄉㄧˋ ㄉㄧˋ" },
-        { id: 10, n: "妹妹", i: "🧒", py: "mèi mei", zy: "ㄇㄟˋ ㄇㄟˋ" },
-        { id: 11, n: "小花", i: "🌸", py: "Xiǎohuā", zy: "ㄒㄧㄠˇ ㄏㄨㄚ" },
-        { id: 12, n: "大文", i: "📘", py: "Dàwén", zy: "ㄉㄚˋ ㄨㄣˊ" }
+        { id: 0, n: "警察局", i: "👮", num: "110", zy: "ㄐㄧㄥˇ ㄔㄚˊ ㄐㄩˊ" },
+        { id: 1, n: "消防局", i: "👨‍🚒", num: "119", zy: "ㄒㄧㄠ ㄈㄤˊ ㄐㄩˊ" },
+        { id: 2, n: "爸爸", i: "👨‍💼", zy: "ㄅㄚˋ ㄅㄚ˙" },
+        { id: 3, n: "媽媽", i: "👩‍🍳", zy: "ㄇㄚ ㄇㄚ" },
+        { id: 4, n: "老師", i: "👩‍🏫", zy: "ㄌㄠˇ ㄕ" },
+        { id: 5, n: "奶奶", i: "👵", zy: "ㄋㄞˇ ㄋㄞˇ" },
+        { id: 6, n: "爺爺", i: "👴", zy: "ㄧㄝˊ ㄧㄝ˙" },
+        { id: 7, n: "哥哥", i: "👦", zy: "ㄍㄜ ㄍㄜ" },
+        { id: 8, n: "姐姐", i: "👧", zy: "ㄐㄧㄝˇ ㄐㄧㄝ˙" },
+        { id: 9, n: "弟弟", i: "👶", zy: "ㄉㄧˋ ㄉㄧˋ" },
+        { id: 10, n: "妹妹", i: "🧒", zy: "ㄇㄟˋ ㄇㄟˋ" },
+        { id: 11, n: "小花", i: "🌸", zy: "ㄒㄧㄠˇ ㄏㄨㄚ" },
+        { id: 12, n: "大文", i: "📘", zy: "ㄉㄚˋ ㄨㄣˊ" }
     ];
 
-    const numsChar = [
-        {zh: '零', v: 0, p: 'líng', z: 'ㄌㄧㄥˊ'}, {zh: '一', v: 1, p: 'yī', z: 'ㄧ'},
-        {zh: '二', v: 2, p: 'èr', z: 'ㄦˋ'}, {zh: '三', v: 3, p: 'sān', z: 'ㄙㄢ'},
-        {zh: '四', v: 4, p: 'sì', z: 'ㄙˋ'}, {zh: '五', v: 5, p: 'wǔ', z: 'ㄨˇ'},
-        {zh: '六', v: 6, p: 'liù', z: 'ㄌㄧㄡˋ'}, {zh: '七', v: 7, p: 'qī', z: 'ㄑㄧ'},
-        {zh: '八', v: 8, p: 'bā', z: 'ㄅㄚ'}, {zh: '九', v: 9, p: 'jiǔ', z: 'ㄐㄧㄡˇ'}
+    const nums = [
+        {zh: '零', v: 0, z: 'ㄌㄧㄥˊ'}, {zh: '一', v: 1, z: 'ㄧ'},
+        {zh: '二', v: 2, z: 'ㄦˋ'}, {zh: '三', v: 3, z: 'ㄙㄢ'},
+        {zh: '四', v: 4, z: 'ㄙˋ'}, {zh: '五', v: 5, z: 'ㄨˇ'},
+        {zh: '六', v: 6, z: 'ㄌㄧㄡˋ'}, {zh: '七', v: 7, z: 'ㄑㄧ'},
+        {zh: '八', v: 8, z: 'ㄅㄚ'}, {zh: '九', v: 9, z: 'ㄐㄧㄡˇ'}
     ];
 
-    let gameState = {
-        name: "",
+    let state = {
+        playerName: "",
         lives: 3,
         collected: new Set(),
-        currentNum: "",
-        dialed: "",
-        targetRole: null
+        target: null,
+        targetNum: "",
+        input: ""
     };
 
-    let audioCtx = null;
-    let bgmNode = null;
+    let audioCtx, bgmNode;
 
-    // --- 音效系統 ---
+    // --- 音效系統 (8-Bit 旋律) ---
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     function playBGM() {
         if (bgmNode) return;
-        const now = audioCtx.currentTime;
         bgmNode = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        bgmNode.type = 'triangle';
-        bgmNode.frequency.setValueAtTime(440, now); // 簡單的和弦循環
-        gain.gain.setValueAtTime(0.05, now);
-        bgmNode.connect(gain);
-        gain.connect(audioCtx.destination);
+        bgmNode.type = 'square';
+        // 循環簡短旋律 (C4-E4-G4-C5)
+        const melody = [261, 329, 392, 523];
+        let i = 0;
+        setInterval(() => {
+            if (bgmNode && audioCtx.state === 'running') {
+                bgmNode.frequency.setValueAtTime(melody[i % 4], audioCtx.currentTime);
+                i++;
+            }
+        }, 500);
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        bgmNode.connect(gain); gain.connect(audioCtx.destination);
         bgmNode.start();
     }
 
-    function stopBGM() {
-        if (bgmNode) {
-            bgmNode.stop();
-            bgmNode = null;
+    function toggleBGM(on) {
+        if (audioCtx) {
+            if (on) audioCtx.resume(); else audioCtx.suspend();
         }
     }
 
-    function beep(freq, dur) {
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.connect(g); g.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-        osc.start(); osc.stop(audioCtx.currentTime + dur);
-    }
-
-    // --- 流程控制 ---
-    function showScene(id) {
+    // --- 流程 ---
+    function switchScene(id) {
         document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function showConfig() {
-        initAudio();
-        playBGM();
-        showScene('config-scene');
+    function goSetup() { initAudio(); playBGM(); switchScene('sc-setup'); }
+
+    function setCase(c) { document.body.className = `case-${c}`; }
+
+    function goStory() {
+        state.playerName = document.getElementById('in-name').value || "小玩家";
+        switchScene('sc-story');
+        const chat = document.getElementById('chat-container');
+        chat.innerHTML = "";
+        const lines = [
+            `叮咚！📬`,
+            `${state.playerName}，救命啊！`,
+            `我忘記帶手機了...`,
+            `可以幫我撥電話給我的家人嗎？`
+        ];
+        lines.forEach((l, idx) => {
+            setTimeout(() => {
+                const b = document.createElement('div');
+                b.className = 'msg-bubble';
+                b.innerText = l;
+                chat.appendChild(b);
+                setTimeout(() => b.classList.add('show'), 50);
+                if(idx === lines.length - 1) document.getElementById('story-next-btn').style.display = 'block';
+            }, idx * 1200);
+        });
     }
 
-    function setShell(color) {
-        document.body.className = `case-${color}`;
-    }
-
-    function startStory() {
-        gameState.name = document.getElementById('player-name').value || "小玩家";
-        document.getElementById('story-text').innerText = `${gameState.name}，快幫幫我！我忘記帶手機了，你可以幫我打電話嗎？`;
-        showScene('story-scene');
-    }
-
-    function initGame() {
-        gameState.dialed = "";
-        document.getElementById('dial-display').innerText = "";
+    function startGame() {
+        state.input = "";
+        document.getElementById('dial-input-area').innerText = "";
         
-        // 挑選未收集角色
-        let pool = roles.filter(r => !gameState.collected.has(r.id));
+        // 優先選未收集
+        let pool = roles.filter(r => !state.collected.has(r.id));
         if (pool.length === 0) pool = roles;
-        gameState.targetRole = pool[Math.floor(Math.random() * pool.length)];
+        state.target = pool[Math.floor(Math.random() * pool.length)];
 
-        // 號碼生成
-        if (gameState.targetRole.num) {
-            gameState.currentNum = gameState.targetRole.num;
-        } else {
-            const len = Math.random() > 0.5 ? 8 : 10;
-            gameState.currentNum = "";
-            for(let i=0; i<len; i++) gameState.currentNum += Math.floor(Math.random()*10);
-        }
-
-        document.getElementById('role-icon').innerText = gameState.targetRole.i;
-        document.getElementById('target-number').innerText = gameState.currentNum;
-        document.getElementById('target-info').innerHTML = `
-            打給 <div class="ruby"><span class="rt">${gameState.targetRole.zy}</span><b>${gameState.targetRole.n}</b></div>
-        `;
+        state.targetNum = state.target.num || 
+            (Math.random() > 0.5 ? "09" : "") + Array.from({length: 8}, () => Math.floor(Math.random()*10)).join("");
+        
+        document.getElementById('ui-target-name').innerText = `打給：${state.target.n} (${state.target.zy})`;
+        document.getElementById('role-icon').innerText = state.target.i;
+        document.getElementById('target-num-display').innerText = state.targetNum;
         
         renderKeypad();
         updateUI();
-        showScene('main-scene');
+        switchScene('sc-main');
     }
 
     function renderKeypad() {
         const pad = document.getElementById('keypad');
         pad.innerHTML = "";
-        let shuffled = [...numsChar].sort(() => Math.random() - 0.5);
-
-        shuffled.slice(0, 9).forEach(n => pad.appendChild(createKey(n)));
+        let shuffled = [...nums].sort(() => Math.random() - 0.5);
+        shuffled.slice(0, 9).forEach(n => pad.appendChild(makeKey(n)));
         
-        // 最後一排
-        pad.appendChild(createActionKey("←", () => {
-            gameState.dialed = gameState.dialed.slice(0, -1);
-            document.getElementById('dial-display').innerText = gameState.dialed;
+        pad.appendChild(makeAction("←", "#ffab91", () => {
+            state.input = state.input.slice(0, -1);
+            document.getElementById('dial-input-area').innerText = state.input;
         }));
-        pad.appendChild(createKey(shuffled[9]));
-        pad.appendChild(createActionKey("📞", handleCall));
+        pad.appendChild(makeKey(shuffled[9]));
+        pad.appendChild(makeAction("📞", "#8ac926", handleCall));
     }
 
-    function createKey(item) {
-        const d = document.createElement('div');
-        d.className = 'key';
-        d.innerHTML = `<span class="key-zh">${item.zh}</span><span class="key-py">${item.z}</span>`;
-        d.onclick = () => {
-            if(gameState.dialed.length < 12) {
-                gameState.dialed += item.v;
-                document.getElementById('dial-display').innerText = gameState.dialed;
-                speak(item.zh);
+    function makeKey(n) {
+        const div = document.createElement('div');
+        div.className = 'digit-key';
+        div.innerHTML = `<span class="zh-char">${n.zh}</span><span class="zy-char">${n.z}</span>`;
+        div.onclick = () => {
+            if(state.input.length < 12) {
+                state.input += n.v;
+                document.getElementById('dial-input-area').innerText = state.input;
+                speak(n.zh);
             }
         };
-        return d;
+        return div;
     }
 
-    function createActionKey(label, cb) {
-        const d = document.createElement('div');
-        d.className = 'key';
-        d.style.background = label === "📞" ? "#81c784" : "#ffab91";
-        d.innerHTML = `<span class="key-zh">${label}</span>`;
-        d.onclick = cb;
-        return d;
+    function makeAction(txt, bg, cb) {
+        const div = document.createElement('div');
+        div.className = 'digit-key';
+        div.style.background = bg;
+        div.innerHTML = `<span class="zh-char" style="color:white">${txt}</span>`;
+        div.onclick = cb;
+        return div;
     }
 
     function handleCall() {
-        if (!gameState.dialed) return;
-        stopBGM(); // 撥號時音樂暫停
-        showScene('calling-scene');
-
-        let count = 0;
-        const interval = setInterval(() => {
-            beep(440, 0.5);
-            count++;
-            if (count >= 3) {
-                clearInterval(interval);
-                finishCall();
+        if(!state.input) return;
+        toggleBGM(false); // 撥號時靜音
+        switchScene('sc-calling');
+        let beeps = 0;
+        const timer = setInterval(() => {
+            playBeep(440, 0.5);
+            beeps++;
+            if(beeps >= 3) {
+                clearInterval(timer);
+                showResult();
             }
         }, 1000);
     }
 
-    function finishCall() {
-        const isSuccess = gameState.dialed === gameState.currentNum;
-        showScene('result-scene');
-        const icon = document.getElementById('result-icon');
-        const msg = document.getElementById('result-msg');
-        const nextBtn = document.getElementById('next-btn');
-        const retryBtn = document.getElementById('retry-btn');
-
-        if (isSuccess) {
-            icon.innerText = "🎉";
-            msg.innerText = "成功接通！\n「喂，你好！」";
-            gameState.collected.add(gameState.targetRole.id);
-            speak("喂，你好");
-            nextBtn.style.display = "block";
-            retryBtn.style.display = "none";
+    function showResult() {
+        const win = state.input === state.targetNum;
+        switchScene('sc-result');
+        const icon = document.getElementById('res-icon');
+        const title = document.getElementById('res-title');
+        const msg = document.getElementById('res-msg');
+        
+        if(win) {
+            icon.innerText = "🎉"; title.innerText = "成功通話！";
+            msg.innerText = "「喂，你好！」";
+            state.collected.add(state.target.id);
+            speak("喂，你好", () => {
+                setTimeout(openMedals, 500); // 語音完跳收集冊
+            });
+            document.getElementById('res-btn').style.display = "block";
+            document.getElementById('fail-btn').style.display = "none";
         } else {
-            icon.innerText = "🚫";
-            msg.innerText = "號碼錯誤...\n這不是我要找的人。";
-            gameState.lives--;
+            icon.innerText = "😵"; title.innerText = "打錯了！";
+            msg.innerText = "您撥的號碼是空號";
+            state.lives--;
             speak("您撥的號碼是空號");
-            if (gameState.lives <= 0) {
-                msg.innerText = "生命值用完了！\n下次再加油！";
-                nextBtn.style.display = "none";
-                retryBtn.style.display = "block";
+            if(state.lives <= 0) {
+                title.innerText = "挑戰失敗";
+                document.getElementById('res-btn').style.display = "none";
+                document.getElementById('fail-btn').style.display = "block";
             } else {
-                nextBtn.style.display = "block";
-                retryBtn.style.display = "none";
+                document.getElementById('res-btn').style.display = "block";
+                document.getElementById('fail-btn').style.display = "none";
             }
         }
         updateUI();
-        updateMedals();
-        playBGM(); // 顯示結果後恢復音樂
+        toggleBGM(true);
     }
 
     function updateUI() {
-        document.getElementById('life-box').innerText = "❤️".repeat(gameState.lives);
+        document.getElementById('ui-hearts').innerText = "❤️".repeat(state.lives);
     }
 
-    function updateMedals() {
-        const list = document.getElementById('medal-list');
-        list.innerHTML = "";
+    function openMedals() {
+        const grid = document.getElementById('ui-medal-grid');
+        grid.innerHTML = "";
         roles.forEach(r => {
-            const d = document.createElement('div');
-            d.className = `medal ${gameState.collected.has(r.id) ? 'won' : ''}`;
-            d.innerHTML = `<div style="font-size:2rem">${r.i}</div>${r.n}`;
-            list.appendChild(d);
+            const slot = document.createElement('div');
+            slot.className = `medal-slot ${state.collected.has(r.id) ? 'active' : ''}`;
+            slot.innerHTML = `<div class="medal-icon">${r.i}</div><div style="font-size:0.8rem">${r.n}</div>`;
+            grid.appendChild(slot);
         });
+        document.getElementById('medal-modal').style.display = 'flex';
     }
 
-    function speak(txt) {
+    function closeMedals() { document.getElementById('medal-modal').style.display = 'none'; }
+
+    function resetGame() {
+        state.lives = 3; state.collected.clear();
+        toggleBGM(true); switchScene('sc-home');
+    }
+
+    function speak(t, cb) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(txt);
+        const u = new SpeechSynthesisUtterance(t);
         u.lang = 'zh-TW';
+        if(cb) u.onend = cb;
         window.speechSynthesis.speak(u);
     }
 
-    function toggleCollection() {
-        const o = document.getElementById('collection-overlay');
-        o.style.display = o.style.display === 'block' ? 'none' : 'block';
+    function playBeep(f, d) {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
+        o.start(); o.stop(audioCtx.currentTime + d);
     }
-
-    function resetGame() {
-        gameState.lives = 3;
-        gameState.collected = new Set();
-        stopBGM();
-        showScene('start-scene');
-    }
-
-    // 初始化調整
-    window.onload = () => {
-        updateMedals();
-        setTimeout(() => {
-            document.body.style.height = window.innerHeight + 'px';
-        }, 100);
-    };
 </script>
-
 </body>
 </html>
