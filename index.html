@@ -3,426 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小小接線生：尋找消失的手機</title>
+    <title>小小接線生 8-Bit Adventure</title>
     <style>
+        /* 載入像素風格字體 (備援) */
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+
         :root {
-            --bg-color: #f0f4f8;
-            --phone-color: #333;
-            --screen-bg: #e0f7fa;
-            --accent: #ff6b6b;
-            --key-text: #455a64;
+            --pixel-black: #212121;
+            --pixel-white: #ffffff;
+            --bg-color: #a2d2ff;
+            --phone-color: #4a4e69;
+            --accent: #ff006e;
+            --screen-bg: #caf0f8;
         }
 
-        /* 四種手機殼配色 */
-        .case-black { --phone-color: #2c3e50; --accent: #3498db; }
-        .case-pink { --phone-color: #ff80ab; --accent: #f06292; }
-        .case-green { --phone-color: #66bb6a; --accent: #2e7d32; }
-        .case-yellow { --phone-color: #fdd835; --accent: #f9a825; }
+        /* 手機殼配色 */
+        .case-black { --phone-color: #3d3d3d; --accent: #00b4d8; }
+        .case-pink { --phone-color: #ffafcc; --accent: #fb6f92; }
+        .case-green { --phone-color: #b7e4c7; --accent: #52b788; }
+        .case-yellow { --phone-color: #ffee93; --accent: #f9a825; }
+
+        * { box-sizing: border-box; font-family: 'ZCOOL KuaiLe', cursive, sans-serif; }
 
         body {
-            font-family: 'Segoe UI', "Microsoft JhengHei", sans-serif;
-            background: var(--bg-color);
-            margin: 0; display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow: hidden; touch-action: manipulation;
-        }
-
-        #game-wrapper {
-            position: relative; transition: transform 0.3s ease;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(var(--pixel-white) 10%, transparent 10%);
+            background-size: 20px 20px;
+            margin: 0; padding: 0;
             display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; overflow: hidden;
+            touch-action: manipulation;
         }
 
-        /* 介面切換控制 */
-        .scene { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        /* 遊戲主容器：自適應縮放 */
+        #game-container {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 100%;
+            max-height: 95vh;
+        }
+
+        /* 精緻手機外殼 */
+        #phone-shell {
+            width: 340px;
+            height: 90vh;
+            max-height: 700px;
+            background: var(--phone-color);
+            border: 8px solid var(--pixel-black);
+            border-radius: 50px;
+            position: relative;
+            box-shadow: 15px 15px 0 rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        /* 手機裝飾細節 */
+        #phone-shell::after {
+            content: ''; position: absolute; top: 20px; width: 60px; height: 6px;
+            background: var(--pixel-black); border-radius: 10px;
+        }
+
+        /* 螢幕區域 */
+        #screen {
+            width: 100%; height: 100%;
+            background: var(--screen-bg);
+            border: 6px solid var(--pixel-black);
+            border-radius: 30px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+
+        /* 介面層級 */
+        .scene {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
         .active { display: flex; }
 
-        /* 標題畫面 */
-        #title-screen { background: white; width: 100vw; height: 100vh; z-index: 100; position: fixed; }
-        .btn-main {
-            padding: 20px 50px; font-size: 1.8rem; border-radius: 50px;
-            border: none; background: #4ecdc4; color: white; cursor: pointer;
-            box-shadow: 0 10px 0 #3bb4ac; transition: 0.1s;
+        /* 8-bit 按鈕風格 */
+        .pixel-btn {
+            background: var(--pixel-white);
+            border: 4px solid var(--pixel-black);
+            box-shadow: 4px 4px 0 var(--pixel-black);
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.1s;
         }
-        .btn-main:active { transform: translateY(5px); box-shadow: 0 5px 0 #3bb4ac; }
+        .pixel-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--pixel-black); }
 
-        /* 手機容器 */
-        #phone-container {
-            width: 340px; background: var(--phone-color); border-radius: 50px;
-            padding: 15px; border: 6px solid rgba(0,0,0,0.1); position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        /* 初始畫面樣式 */
+        #start-scene { background: #bde0fe; }
+        .logo-box { font-size: 2.5rem; color: var(--accent); text-shadow: 4px 4px 0 #fff; margin-bottom: 20px; }
+
+        /* 置中設定卡 */
+        .config-card { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .color-picker { display: flex; gap: 10px; margin: 15px 0; }
+        .color-dot { width: 40px; height: 40px; border: 3px solid #000; border-radius: 50%; cursor: pointer; }
+
+        /* 頂部功能條 */
+        #status-bar {
+            width: 100%; padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: absolute; top: 0; left: 0; z-index: 50;
+        }
+        .heart-life { font-size: 1.2rem; }
+        .exit-btn { font-size: 1.5rem; cursor: pointer; }
+
+        /* 獎盃大按鈕 */
+        #trophy-btn {
+            position: absolute; bottom: 20px; right: -20px;
+            width: 70px; height: 70px; background: #ffd700;
+            border: 5px solid var(--pixel-black); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; cursor: pointer; z-index: 60;
+            box-shadow: 4px 4px 0 var(--pixel-black);
         }
 
-        /* 生命值與收集冊圖示 */
-        #top-bar {
-            display: flex; justify-content: space-between; width: 100%;
-            padding: 5px 15px; box-sizing: border-box; position: absolute; top: 35px; left: 0; z-index: 10;
+        /* 遊戲內容 */
+        #role-icon { font-size: 4rem; margin-top: 20px; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.1)); }
+        .role-name-box { margin: 10px 0; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 10px; }
+        #target-number { font-size: 1.8rem; font-weight: bold; color: var(--accent); letter-spacing: 2px; }
+        #dial-display { font-size: 1.6rem; height: 2rem; margin-top: 10px; color: #333; font-weight: bold; border-bottom: 3px dashed #999; width: 80%; }
+
+        /* 撥號鍵盤 */
+        #keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 8px; width: 100%; padding: 15px; background: rgba(0,0,0,0.05);
         }
-        .heart-container { color: #ff5252; font-size: 1.2rem; }
-        #collection-trigger { font-size: 1.5rem; cursor: pointer; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); }
-
-        #screen {
-            background: var(--screen-bg); border-radius: 35px; height: 260px;
-            margin-top: 15px; margin-bottom: 15px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 20px; text-align: center;
-            border: 4px solid rgba(255,255,255,0.3); position: relative;
-        }
-
-        #role-display { font-size: 4.5rem; margin-top: 20px; }
-        .target-box { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 5px 15px; margin-top: 5px; }
-        .ruby { display: inline-block; text-align: center; margin: 0 2px; vertical-align: bottom; }
-        .ruby-m { display: block; font-size: 1.2rem; font-weight: bold; }
-        .ruby-s { display: block; font-size: 0.6rem; color: #666; }
-
-        #target-number { font-size: 2rem; font-weight: 900; color: var(--accent); letter-spacing: 2px; }
-        #dialed-text { font-size: 1.6rem; min-height: 2rem; margin-top: 5px; font-weight: bold; color: #333; }
-
-        /* 撥號盤 */
-        #keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px; }
         .key {
-            background: white; border-radius: 18px; height: 75px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 5px 0 #ccc; transition: 0.1s;
+            background: white; border: 3px solid var(--pixel-black); border-radius: 12px;
+            height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 3px 3px 0 var(--pixel-black);
         }
-        .key:active { transform: translateY(3px); box-shadow: 0 2px 0 #ccc; }
-        .key .zh { font-size: 1.6rem; font-weight: bold; color: var(--key-text); }
-        .key .py { font-size: 0.6rem; color: #999; }
+        .key:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--pixel-black); }
+        .key-zh { font-size: 1.4rem; font-weight: bold; }
+        .key-py { font-size: 0.6rem; color: #666; }
 
-        .key.del { background: #ffab91; box-shadow: 0 5px 0 #d84315; color: white; font-size: 1.8rem; }
-        .key.call { background: #81c784; box-shadow: 0 5px 0 #2e7d32; color: white; font-size: 1.8rem; }
-
-        /* 收集冊 Modal */
-        #modal-overlay {
+        /* 收集冊 */
+        #collection-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.98); border-radius: 45px; z-index: 200;
-            display: none; flex-direction: column; align-items: center; padding: 40px 20px;
-            box-sizing: border-box; overflow-y: auto;
+            background: var(--screen-bg); z-index: 100; display: none; padding: 20px;
         }
-        .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
-        .medal { display: flex; flex-direction: column; align-items: center; opacity: 0.2; filter: grayscale(1); transition: 0.5s; }
-        .medal.collected { opacity: 1; filter: grayscale(0); }
-        .medal-icon { font-size: 2.5rem; background: #eee; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; }
-        .medal.collected .medal-icon { background: #fff176; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .medal-name { font-size: 0.7rem; color: #444; }
+        .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow-y: auto; height: 80%; }
+        .medal { opacity: 0.2; filter: grayscale(1); display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; }
+        .medal.won { opacity: 1; filter: grayscale(0); }
 
-        /* 設定與手機選擇 */
-        .config-card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
-        .shell-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
-        .shell-btn { width: 60px; height: 80px; border-radius: 10px; border: 4px solid transparent; cursor: pointer; transition: 0.2s; }
-        .shell-btn.selected { border-color: #4ecdc4; transform: scale(1.1); }
+        /* 撥號效果 */
+        #calling-scene { background: #333; color: white; }
+        .dot-animation::after { content: '...'; animation: dots 1.5s infinite; }
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
 
-        #dialog-box {
-            position: fixed; top: 20%; background: white; padding: 25px; border-radius: 20px;
-            width: 80%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 50; text-align: center;
-        }
+        /* 注音標記 */
+        .ruby { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; margin: 0 2px; }
+        .rt { font-size: 0.6rem; color: #555; margin-bottom: 2px; }
     </style>
 </head>
 <body class="case-black">
 
-<div id="title-screen" class="scene active">
-    <h1 style="color: #455a64; font-size: 2.5rem; text-align: center;">小小接線生<br><span style="font-size: 1.2rem;">Little Operator</span></h1>
-    <button class="btn-main" onclick="goToSetup()">START</button>
-</div>
-
-<div id="setup-screen" class="scene">
-    <div class="config-card">
-        <h3>請輸入你的名字：</h3>
-        <input type="text" id="player-name" placeholder="你的名字" style="padding: 10px; font-size: 1.2rem; border-radius: 10px; border: 2px solid #ddd; width: 80%;">
-        <h3>選擇手機殼：</h3>
-        <div class="shell-options">
-            <div class="shell-btn" style="background: #2c3e50;" onclick="selectShell('black', this)"></div>
-            <div class="shell-btn" style="background: #ff80ab;" onclick="selectShell('pink', this)"></div>
-            <div class="shell-btn" style="background: #66bb6a;" onclick="selectShell('green', this)"></div>
-            <div class="shell-btn" style="background: #fdd835;" onclick="selectShell('yellow', this)"></div>
-        </div>
-        <button class="btn-main" onclick="startStory()">確定</button>
-    </div>
-</div>
-
-<div id="story-overlay" class="scene" style="background: rgba(0,0,0,0.5); position: fixed; z-index: 200;">
-    <div id="dialog-box">
-        <p id="dialog-text" style="font-size: 1.3rem; line-height: 1.6;"></p>
-        <button class="btn-main" style="padding: 10px 30px; font-size: 1.2rem;" onclick="enterGame()">好！沒問題</button>
-    </div>
-</div>
-
-<div id="game-wrapper">
-    <div id="phone-container">
-        <div id="top-bar">
-            <div class="heart-container" id="hearts">❤️❤️❤️</div>
-            <div id="collection-trigger" onclick="toggleCollection()">🏆</div>
-        </div>
-
+<div id="game-container">
+    <div id="phone-shell">
         <div id="screen">
-            <div id="role-display">👤</div>
-            <div class="target-box">
-                <div class="ruby"><span class="ruby-m">打</span><span class="ruby-s">dǎ/ㄉㄚˇ</span></div>
-                <div class="ruby"><span class="ruby-m">給</span><span class="ruby-s">gěi/ㄍㄟˇ</span></div>
-                <span id="role-name-ruby"></span>
+            
+            <div id="start-scene" class="scene active">
+                <div class="logo-box">📞小小接線生</div>
+                <button class="pixel-btn" onclick="showConfig()">START</button>
             </div>
-            <div id="target-number">-------</div>
-            <div id="dialed-text"></div>
-        </div>
 
-        <div id="keypad"></div>
+            <div id="config-scene" class="scene">
+                <div class="config-card">
+                    <p>你的名字:</p>
+                    <input type="text" id="player-name" style="width: 80%; padding: 8px; border: 3px solid #000;" placeholder="小玩家">
+                    <p>選擇手機顏色:</p>
+                    <div class="color-picker">
+                        <div class="color-dot" style="background:#3d3d3d" onclick="setShell('black')"></div>
+                        <div class="color-dot" style="background:#ffafcc" onclick="setShell('pink')"></div>
+                        <div class="color-dot" style="background:#b7e4c7" onclick="setShell('green')"></div>
+                        <div class="color-dot" style="background:#ffee93" onclick="setShell('yellow')"></div>
+                    </div>
+                    <button class="pixel-btn" onclick="startStory()">確定!</button>
+                </div>
+            </div>
 
-        <div id="modal-overlay">
-            <h2 style="margin-top:0;">角色收集冊</h2>
-            <div class="collection-grid" id="medal-grid"></div>
-            <button class="btn-main" style="margin-top: 30px; padding: 10px 20px; font-size: 1rem;" onclick="toggleCollection()">關閉</button>
+            <div id="story-scene" class="scene" style="background: white;">
+                <p id="story-text" style="line-height: 1.6; padding: 20px;"></p>
+                <button class="pixel-btn" onclick="initGame()">沒問題!</button>
+            </div>
+
+            <div id="main-scene" class="scene">
+                <div id="status-bar">
+                    <div id="life-box" class="heart-life">❤️❤️❤️</div>
+                    <div class="exit-btn" onclick="resetGame()">✖️</div>
+                </div>
+                <div id="role-icon">👤</div>
+                <div class="role-name-box" id="target-info"></div>
+                <div id="target-number">--------</div>
+                <div id="dial-display"></div>
+                
+                <div id="keypad"></div>
+                <div id="trophy-btn" onclick="toggleCollection()">🏆</div>
+            </div>
+
+            <div id="calling-scene" class="scene">
+                <div style="font-size: 5rem;">📞</div>
+                <h2 class="dot-animation">撥號中</h2>
+            </div>
+
+            <div id="result-scene" class="scene">
+                <div id="result-icon" style="font-size: 5rem;"></div>
+                <h2 id="result-msg"></h2>
+                <button id="next-btn" class="pixel-btn" onclick="initGame()">下一題</button>
+                <button id="retry-btn" class="pixel-btn" onclick="resetGame()" style="display:none">回首頁</button>
+            </div>
+
+            <div id="collection-overlay">
+                <h3>🏆 角色收集冊</h3>
+                <div class="medal-grid" id="medal-list"></div>
+                <button class="pixel-btn" onclick="toggleCollection()">關閉</button>
+            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-    // --- 資料設定 ---
-    const allRoles = [
-        { id: 0, name: "警察局", icon: "👮", num: "110", p: "jǐngchájú", z: "ㄐㄧㄥˇㄔㄚˊㄐㄩˊ", fixed: true },
-        { id: 1, name: "消防局", icon: "👨‍🚒", num: "119", p: "xiāofángjú", z: "ㄒㄧㄠㄈㄤˊㄐㄩˊ", fixed: true },
-        { id: 2, name: "爸爸", icon: "👨‍💼", p: "bàba", z: "ㄅㄚˋ˙ㄅㄚ" },
-        { id: 3, name: "媽媽", icon: "👩‍🍳", p: "māma", z: "ㄇㄚㄇㄚ" },
-        { id: 4, name: "老師", icon: "👩‍🏫", p: "lǎoshī", z: "ㄌㄠˇㄕ" },
-        { id: 5, name: "奶奶", icon: "👵", p: "nǎinai", z: "ㄋㄞˇㄋㄞ" },
-        { id: 6, name: "爺爺", icon: "👴", p: "yéye", z: "ㄧㄝˊ˙ㄧㄝ" },
-        { id: 7, name: "哥哥", icon: "👦", p: "gēge", z: "ㄍㄜㄍㄜ" },
-        { id: 8, name: "姐姐", icon: "👧", p: "jiějie", z: "ㄐㄧㄝˇ˙ㄐㄧㄝ" },
-        { id: 9, name: "弟弟", icon: "👶", p: "dìdi", z: "ㄉㄧˋ˙ㄉㄧ" },
-        { id: 10, name: "妹妹", icon: "🧒", p: "mèimei", z: "ㄇㄟˋ˙ㄇㄟ" },
-        { id: 11, name: "小花", icon: "🌸", p: "Xiǎohuā", z: "ㄒㄧㄠˇㄏㄨㄚ" },
-        { id: 12, name: "大文", icon: "📘", p: "Dàwén", z: "ㄉㄚˋㄨㄣˊ" }
+    // --- 資料定義 ---
+    const roles = [
+        { id: 0, n: "警察局", i: "👮", num: "110", py: "jǐng chájú", zy: "ㄐㄧㄥˇ ㄔㄚˊㄐㄩˊ" },
+        { id: 1, n: "消防局", i: "👨‍🚒", num: "119", py: "xiāo fángjú", zy: "ㄒㄧㄠ ㄈㄤˊㄐㄩˊ" },
+        { id: 2, n: "爸爸", i: "👨‍💼", py: "bà ba", zy: "ㄅㄚˋ ㄅㄚ˙" },
+        { id: 3, n: "媽媽", i: "👩‍🍳", py: "mā ma", zy: "ㄇㄚ ㄇㄚ" },
+        { id: 4, n: "老師", i: "👩‍🏫", py: "lǎo shī", zy: "ㄌㄠˇ ㄕ" },
+        { id: 5, n: "奶奶", i: "👵", py: "nǎi nai", zy: "ㄋㄞˇ ㄋㄞˇ" },
+        { id: 6, n: "爺爺", i: "👴", py: "yé ye", zy: "ㄧㄝˊ ㄧㄝ˙" },
+        { id: 7, n: "哥哥", i: "👦", py: "gē ge", zy: "ㄍㄜ ㄍㄜ" },
+        { id: 8, n: "姐姐", i: "👧", py: "jiě jie", zy: "ㄐㄧㄝˇ ㄐㄧㄝ˙" },
+        { id: 9, n: "弟弟", i: "👶", py: "dì di", zy: "ㄉㄧˋ ㄉㄧˋ" },
+        { id: 10, n: "妹妹", i: "🧒", py: "mèi mei", zy: "ㄇㄟˋ ㄇㄟˋ" },
+        { id: 11, n: "小花", i: "🌸", py: "Xiǎohuā", zy: "ㄒㄧㄠˇ ㄏㄨㄚ" },
+        { id: 12, n: "大文", i: "📘", py: "Dàwén", zy: "ㄉㄚˋ ㄨㄣˊ" }
     ];
 
-    const characters = [
-        {h: '零', p: 'líng', z: 'ㄌㄧㄥˊ', v: 0}, {h: '一', p: 'yī', z: 'ㄧ', v: 1},
-        {h: '二', p: 'èr', z: 'ㄦˋ', v: 2}, {h: '三', p: 'sān', z: 'ㄙㄢ', v: 3},
-        {h: '四', p: 'sì', z: 'ㄙˋ', v: 4}, {h: '五', p: 'wǔ', z: 'ㄨˇ', v: 5},
-        {h: '六', p: 'liù', z: 'ㄌㄧㄡˋ', v: 6}, {h: '七', p: 'qī', z: 'ㄑㄧ', v: 7},
-        {h: '八', p: 'bā', z: 'ㄅㄚ', v: 8}, {h: '九', p: 'jiǔ', z: 'ㄐㄧㄡˇ', v: 9}
+    const numsChar = [
+        {zh: '零', v: 0, p: 'líng', z: 'ㄌㄧㄥˊ'}, {zh: '一', v: 1, p: 'yī', z: 'ㄧ'},
+        {zh: '二', v: 2, p: 'èr', z: 'ㄦˋ'}, {zh: '三', v: 3, p: 'sān', z: 'ㄙㄢ'},
+        {zh: '四', v: 4, p: 'sì', z: 'ㄙˋ'}, {zh: '五', v: 5, p: 'wǔ', z: 'ㄨˇ'},
+        {zh: '六', v: 6, p: 'liù', z: 'ㄌㄧㄡˋ'}, {zh: '七', v: 7, p: 'qī', z: 'ㄑㄧ'},
+        {zh: '八', v: 8, p: 'bā', z: 'ㄅㄚ'}, {zh: '九', v: 9, p: 'jiǔ', z: 'ㄐㄧㄡˇ'}
     ];
 
-    let state = {
-        name: "同學",
-        shell: "black",
-        hearts: 3,
+    let gameState = {
+        name: "",
+        lives: 3,
         collected: new Set(),
-        currentTarget: null,
+        currentNum: "",
         dialed: "",
-        bgmActive: false
+        targetRole: null
     };
 
     let audioCtx = null;
+    let bgmNode = null;
 
-    // --- 介面切換 ---
-    function goToSetup() {
-        document.getElementById('title-screen').classList.remove('active');
-        document.getElementById('setup-screen').classList.add('active');
-        initAudio(); 
-    }
-
-    function selectShell(color, btn) {
-        state.shell = color;
-        document.body.className = `case-${color}`;
-        document.querySelectorAll('.shell-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-    }
-
-    function startStory() {
-        state.name = document.getElementById('player-name').value || "同學";
-        document.getElementById('setup-screen').classList.remove('active');
-        document.getElementById('story-overlay').classList.add('active');
-        document.getElementById('dialog-text').innerText = `${state.name}，快幫幫我！我忘記帶手機了，你可以幫我打電話嗎？`;
-        if(!state.bgmActive) playBGM();
-    }
-
-    function enterGame() {
-        document.getElementById('story-overlay').classList.remove('active');
-        nextTurn();
-    }
-
-    // --- 核心邏輯 ---
-    function nextTurn() {
-        state.dialed = "";
-        updateDisplay();
-        
-        // 篩選未收集的角色 (若全集滿則重置或隨機)
-        let pool = allRoles.filter(r => !state.collected.has(r.id));
-        if(pool.length === 0) pool = allRoles; 
-
-        state.currentTarget = pool[Math.floor(Math.random() * pool.length)];
-        
-        // 號碼生成
-        let displayNum = state.currentTarget.fixed ? state.currentTarget.num : 
-                        (Math.random() > 0.5 ? "" : "09") + Array.from({length: 8}, () => Math.floor(Math.random()*10)).join("");
-        if(!state.currentTarget.fixed && displayNum.length > 10) displayNum = displayNum.slice(0,10);
-        
-        state.currentNum = displayNum;
-        document.getElementById('role-display').innerText = state.currentTarget.icon;
-        document.getElementById('role-name-ruby').innerHTML = `
-            <div class="ruby"><span class="ruby-m">${state.currentTarget.name}</span><span class="ruby-s">${state.currentTarget.p}/${state.currentTarget.z}</span></div>
-        `;
-        document.getElementById('target-number').innerText = displayNum;
-        
-        renderKeypad();
-        adjustScale();
-    }
-
-    function renderKeypad() {
-        const keypad = document.getElementById('keypad');
-        keypad.innerHTML = "";
-        let shuffled = [...characters].sort(() => Math.random() - 0.5);
-
-        for(let i=0; i<9; i++) keypad.appendChild(createKey(shuffled[i]));
-        
-        keypad.appendChild(createActionKey("←", "del", () => {
-            state.dialed = state.dialed.slice(0, -1);
-            updateDisplay();
-        }));
-        keypad.appendChild(createKey(shuffled[9]));
-        keypad.appendChild(createActionKey("📞", "call", handleCall));
-    }
-
-    function createKey(char) {
-        const div = document.createElement('div');
-        div.className = 'key';
-        div.innerHTML = `<span class="zh">${char.h}</span><span class="py">${char.z}<br>${char.p}</span>`;
-        div.onclick = () => {
-            if(state.dialed.length < 12) {
-                state.dialed += char.v;
-                updateDisplay();
-                speak(char.h);
-            }
-        };
-        return div;
-    }
-
-    function createActionKey(label, cls, cb) {
-        const div = document.createElement('div');
-        div.className = `key ${cls}`;
-        div.innerHTML = label;
-        div.onclick = cb;
-        return div;
-    }
-
-    function updateDisplay() {
-        document.getElementById('dialed-text').innerText = state.dialed;
-        document.getElementById('hearts').innerText = "❤️".repeat(state.hearts);
-    }
-
-    function handleCall() {
-        if(!state.dialed) return;
-        const correct = state.dialed === state.currentNum;
-        
-        // 撥號音效
-        let dialCount = 0;
-        const timer = setInterval(() => {
-            beep(400, 0.5);
-            dialCount++;
-            if(dialCount >= 2) {
-                clearInterval(timer);
-                if(correct) {
-                    speak("喂，你好", () => {
-                        state.collected.add(state.currentTarget.id);
-                        updateMedals();
-                        toggleCollection(true);
-                        setTimeout(nextTurn, 2000);
-                    });
-                } else {
-                    state.hearts--;
-                    updateDisplay();
-                    speak("您撥的號碼是空號");
-                    if(state.hearts <= 0) {
-                        setTimeout(() => {
-                            alert("遊戲結束！請重新挑戰。");
-                            state.hearts = 3;
-                            document.getElementById('title-screen').classList.add('active');
-                        }, 2000);
-                    } else {
-                        setTimeout(nextTurn, 2000);
-                    }
-                }
-            }
-        }, 800);
-    }
-
-    // --- 收集冊系統 ---
-    function initMedals() {
-        const grid = document.getElementById('medal-grid');
-        grid.innerHTML = "";
-        allRoles.forEach(role => {
-            const div = document.createElement('div');
-            div.className = 'medal';
-            div.id = `medal-${role.id}`;
-            div.innerHTML = `
-                <div class="medal-icon">${role.icon}</div>
-                <div class="medal-name">${role.name}</div>
-            `;
-            grid.appendChild(div);
-        });
-    }
-
-    function updateMedals() {
-        allRoles.forEach(role => {
-            if(state.collected.has(role.id)) {
-                document.getElementById(`medal-${role.id}`).classList.add('collected');
-            }
-        });
-    }
-
-    function toggleCollection(forceOpen = false) {
-        const modal = document.getElementById('modal-overlay');
-        modal.style.display = (forceOpen || modal.style.display !== 'flex') ? 'flex' : 'none';
-    }
-
-    // --- 音效與語音 ---
+    // --- 音效系統 ---
     function initAudio() {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playBGM() {
+        if (bgmNode) return;
+        const now = audioCtx.currentTime;
+        bgmNode = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        bgmNode.type = 'triangle';
+        bgmNode.frequency.setValueAtTime(440, now); // 簡單的和弦循環
+        gain.gain.setValueAtTime(0.05, now);
+        bgmNode.connect(gain);
+        gain.connect(audioCtx.destination);
+        bgmNode.start();
+    }
+
+    function stopBGM() {
+        if (bgmNode) {
+            bgmNode.stop();
+            bgmNode = null;
+        }
     }
 
     function beep(freq, dur) {
         const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
+        const g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
         osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
         osc.start(); osc.stop(audioCtx.currentTime + dur);
     }
 
-    function playBGM() {
-        state.bgmActive = true;
-        // 產生輕柔的電子背景音 (每 4 秒循環)
-        setInterval(() => {
-            const now = audioCtx.currentTime;
-            [261, 329, 392, 523].forEach((f, i) => {
-                const g = audioCtx.createGain();
-                const o = audioCtx.createOscillator();
-                o.connect(g); g.connect(audioCtx.destination);
-                o.frequency.value = f;
-                g.gain.setValueAtTime(0, now + i*0.5);
-                g.gain.linearRampToValueAtTime(0.02, now + i*0.5 + 0.1);
-                g.gain.linearRampToValueAtTime(0, now + i*0.5 + 2);
-                o.start(now + i*0.5); o.stop(now + i*0.5 + 2);
-            });
-        }, 4000);
+    // --- 流程控制 ---
+    function showScene(id) {
+        document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
-    function speak(text, cb) {
+    function showConfig() {
+        initAudio();
+        playBGM();
+        showScene('config-scene');
+    }
+
+    function setShell(color) {
+        document.body.className = `case-${color}`;
+    }
+
+    function startStory() {
+        gameState.name = document.getElementById('player-name').value || "小玩家";
+        document.getElementById('story-text').innerText = `${gameState.name}，快幫幫我！我忘記帶手機了，你可以幫我打電話嗎？`;
+        showScene('story-scene');
+    }
+
+    function initGame() {
+        gameState.dialed = "";
+        document.getElementById('dial-display').innerText = "";
+        
+        // 挑選未收集角色
+        let pool = roles.filter(r => !gameState.collected.has(r.id));
+        if (pool.length === 0) pool = roles;
+        gameState.targetRole = pool[Math.floor(Math.random() * pool.length)];
+
+        // 號碼生成
+        if (gameState.targetRole.num) {
+            gameState.currentNum = gameState.targetRole.num;
+        } else {
+            const len = Math.random() > 0.5 ? 8 : 10;
+            gameState.currentNum = "";
+            for(let i=0; i<len; i++) gameState.currentNum += Math.floor(Math.random()*10);
+        }
+
+        document.getElementById('role-icon').innerText = gameState.targetRole.i;
+        document.getElementById('target-number').innerText = gameState.currentNum;
+        document.getElementById('target-info').innerHTML = `
+            打給 <div class="ruby"><span class="rt">${gameState.targetRole.zy}</span><b>${gameState.targetRole.n}</b></div>
+        `;
+        
+        renderKeypad();
+        updateUI();
+        showScene('main-scene');
+    }
+
+    function renderKeypad() {
+        const pad = document.getElementById('keypad');
+        pad.innerHTML = "";
+        let shuffled = [...numsChar].sort(() => Math.random() - 0.5);
+
+        shuffled.slice(0, 9).forEach(n => pad.appendChild(createKey(n)));
+        
+        // 最後一排
+        pad.appendChild(createActionKey("←", () => {
+            gameState.dialed = gameState.dialed.slice(0, -1);
+            document.getElementById('dial-display').innerText = gameState.dialed;
+        }));
+        pad.appendChild(createKey(shuffled[9]));
+        pad.appendChild(createActionKey("📞", handleCall));
+    }
+
+    function createKey(item) {
+        const d = document.createElement('div');
+        d.className = 'key';
+        d.innerHTML = `<span class="key-zh">${item.zh}</span><span class="key-py">${item.z}</span>`;
+        d.onclick = () => {
+            if(gameState.dialed.length < 12) {
+                gameState.dialed += item.v;
+                document.getElementById('dial-display').innerText = gameState.dialed;
+                speak(item.zh);
+            }
+        };
+        return d;
+    }
+
+    function createActionKey(label, cb) {
+        const d = document.createElement('div');
+        d.className = 'key';
+        d.style.background = label === "📞" ? "#81c784" : "#ffab91";
+        d.innerHTML = `<span class="key-zh">${label}</span>`;
+        d.onclick = cb;
+        return d;
+    }
+
+    function handleCall() {
+        if (!gameState.dialed) return;
+        stopBGM(); // 撥號時音樂暫停
+        showScene('calling-scene');
+
+        let count = 0;
+        const interval = setInterval(() => {
+            beep(440, 0.5);
+            count++;
+            if (count >= 3) {
+                clearInterval(interval);
+                finishCall();
+            }
+        }, 1000);
+    }
+
+    function finishCall() {
+        const isSuccess = gameState.dialed === gameState.currentNum;
+        showScene('result-scene');
+        const icon = document.getElementById('result-icon');
+        const msg = document.getElementById('result-msg');
+        const nextBtn = document.getElementById('next-btn');
+        const retryBtn = document.getElementById('retry-btn');
+
+        if (isSuccess) {
+            icon.innerText = "🎉";
+            msg.innerText = "成功接通！\n「喂，你好！」";
+            gameState.collected.add(gameState.targetRole.id);
+            speak("喂，你好");
+            nextBtn.style.display = "block";
+            retryBtn.style.display = "none";
+        } else {
+            icon.innerText = "🚫";
+            msg.innerText = "號碼錯誤...\n這不是我要找的人。";
+            gameState.lives--;
+            speak("您撥的號碼是空號");
+            if (gameState.lives <= 0) {
+                msg.innerText = "生命值用完了！\n下次再加油！";
+                nextBtn.style.display = "none";
+                retryBtn.style.display = "block";
+            } else {
+                nextBtn.style.display = "block";
+                retryBtn.style.display = "none";
+            }
+        }
+        updateUI();
+        updateMedals();
+        playBGM(); // 顯示結果後恢復音樂
+    }
+
+    function updateUI() {
+        document.getElementById('life-box').innerText = "❤️".repeat(gameState.lives);
+    }
+
+    function updateMedals() {
+        const list = document.getElementById('medal-list');
+        list.innerHTML = "";
+        roles.forEach(r => {
+            const d = document.createElement('div');
+            d.className = `medal ${gameState.collected.has(r.id) ? 'won' : ''}`;
+            d.innerHTML = `<div style="font-size:2rem">${r.i}</div>${r.n}`;
+            list.appendChild(d);
+        });
+    }
+
+    function speak(txt) {
         window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'zh-TW';
-        msg.rate = 0.9;
-        if(cb) msg.onend = cb;
-        window.speechSynthesis.speak(msg);
+        const u = new SpeechSynthesisUtterance(txt);
+        u.lang = 'zh-TW';
+        window.speechSynthesis.speak(u);
     }
 
-    // --- 輔助功能 ---
-    function adjustScale() {
-        const wrapper = document.getElementById('game-wrapper');
-        const phone = document.getElementById('phone-container');
-        const scale = Math.min(window.innerWidth / 360, window.innerHeight / 750, 1);
-        wrapper.style.transform = `scale(${scale})`;
+    function toggleCollection() {
+        const o = document.getElementById('collection-overlay');
+        o.style.display = o.style.display === 'block' ? 'none' : 'block';
     }
 
-    window.onresize = adjustScale;
-    initMedals();
+    function resetGame() {
+        gameState.lives = 3;
+        gameState.collected = new Set();
+        stopBGM();
+        showScene('start-scene');
+    }
+
+    // 初始化調整
+    window.onload = () => {
+        updateMedals();
+        setTimeout(() => {
+            document.body.style.height = window.innerHeight + 'px';
+        }, 100);
+    };
 </script>
+
 </body>
 </html>
