@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALL ME PLZ! </title>
+    <title>CALL ME PLZ! - 8-Bit Adventure</title>
     <style>
         :root {
             --pixel-black: #212121;
@@ -11,60 +11,35 @@
             --bg-sky: #a2d2ff;
             --phone-case: #4a4e69;
             --accent-red: #ff595e;
-            --accent-green: #8ac926;
-            --bubble-friend: #f1f1f1;
-            --text-color: #2b2d42;
+            --bubble-friend: #e9e9eb;
+            --bubble-me: #34c759;
         }
 
-        /* 顏色套件 */
-        .case-black { --phone-case: #333533; --accent-btn: #4cc9f0; }
-        .case-pink { --phone-case: #ffafcc; --accent-btn: #ff0a54; }
-        .case-green { --phone-case: #b7e4c7; --accent-btn: #2d6a4f; }
-        .case-yellow { --phone-case: #fee440; --accent-btn: #f95738; }
+        .case-black { --phone-case: #333533; }
+        .case-pink { --phone-case: #ffafcc; }
+        .case-green { --phone-case: #b7e4c7; }
+        .case-yellow { --phone-case: #fee440; }
 
-        * { 
-            box-sizing: border-box; 
-            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif; 
-            font-weight: bold;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; font-family: "Microsoft JhengHei", sans-serif; font-weight: bold; }
 
         body {
             background-color: var(--bg-sky);
             background-image: radial-gradient(var(--pixel-white) 15%, transparent 15%);
             background-size: 30px 30px;
             margin: 0; display: flex; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw; overflow: hidden;
-        }
-
-        /* 遊戲自適應容器 */
-        #game-wrapper {
-            position: relative;
-            width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
         }
 
         #phone-body {
             width: 350px; height: 92vh; max-height: 750px;
-            background: var(--phone-case);
-            border: 8px solid var(--pixel-black);
-            border-radius: 55px;
-            position: relative;
+            background: var(--phone-case); border: 8px solid var(--pixel-black);
+            border-radius: 55px; position: relative; padding: 12px; display: flex; flex-direction: column;
             box-shadow: 12px 12px 0 rgba(0,0,0,0.2);
-            padding: 12px; display: flex; flex-direction: column;
         }
 
-        #phone-body::before { /* 聽筒 */
-            content: ''; position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
-            width: 70px; height: 8px; background: var(--pixel-black); border-radius: 10px;
-        }
-
-        /* 螢幕主區 */
         #screen {
-            flex: 1; background: #f8f9fa;
-            border: 6px solid var(--pixel-black);
-            border-radius: 35px; overflow: hidden;
-            position: relative; display: flex; flex-direction: column;
+            flex: 1; background: #f8f9fa; border: 6px solid var(--pixel-black);
+            border-radius: 35px; overflow: hidden; position: relative; display: flex; flex-direction: column;
         }
 
         .scene {
@@ -74,59 +49,39 @@
         }
         .active { display: flex; }
 
-        /* 標題畫面 */
         .logo { font-size: 2.8rem; color: #ff9f1c; text-shadow: 4px 4px 0 var(--pixel-black); margin-bottom: 30px; }
         
-        /* 萬用像素按鈕 */
         .btn-pixel {
             background: var(--pixel-white); border: 4px solid var(--pixel-black);
-            box-shadow: 5px 5px 0 var(--pixel-black);
-            padding: 12px 30px; font-size: 1.5rem; cursor: pointer; margin: 10px;
-            transition: 0.1s;
+            box-shadow: 5px 5px 0 var(--pixel-black); padding: 12px 30px; font-size: 1.5rem;
+            cursor: pointer; margin: 10px; transition: 0.1s;
         }
         .btn-pixel:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--pixel-black); }
 
-        /* 設定頁置中 */
-        .setup-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .setup-input { 
-            width: 85%; padding: 10px; font-size: 1.3rem; border: 4px solid var(--pixel-black); 
-            margin-bottom: 20px; text-align: center;
-        }
-        .color-row { display: flex; gap: 15px; margin-bottom: 25px; }
+        /* 顏色選擇器 */
+        .color-row { display: flex; gap: 15px; margin: 20px 0; }
         .color-opt { width: 45px; height: 45px; border-radius: 50%; border: 4px solid var(--pixel-black); cursor: pointer; }
 
-        /* 簡訊對話框樣式 */
-        #chat-container { width: 100%; padding: 10px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-bubble {
-            background: var(--bubble-friend); border: 3px solid var(--pixel-black);
-            padding: 12px; border-radius: 15px; align-self: flex-start;
-            max-width: 85%; font-size: 1.1rem; text-align: left;
-            position: relative; opacity: 0; transform: translateY(10px);
-            transition: 0.4s all;
+        /* 對話框樣式 */
+        #chat-container { width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 10px; overflow-y: auto; }
+        .msg {
+            padding: 10px 15px; border-radius: 18px; max-width: 80%; font-size: 1.1rem;
+            opacity: 0; transform: translateY(10px); transition: 0.3s all; border: 2px solid var(--pixel-black);
         }
-        .msg-bubble.show { opacity: 1; transform: translateY(0); }
+        .msg.friend { background: var(--bubble-friend); align-self: flex-start; }
+        .msg.me { background: var(--bubble-me); color: white; align-self: flex-end; }
+        .msg.show { opacity: 1; transform: translateY(0); }
 
-        /* 頂部功能列：左紅心、中獎盃、右離開 */
+        #chat-options { display: none; gap: 10px; margin-top: 20px; }
+
+        /* 導覽列 */
         #nav-bar {
             width: 100%; height: 60px; padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.05); border-bottom: 3px solid var(--pixel-black);
         }
-        .nav-item { font-size: 1.5rem; display: flex; align-items: center; cursor: pointer; }
-        .hearts { color: var(--accent-red); letter-spacing: 2px; }
-        .trophy-btn { font-size: 1.8rem; transition: 0.2s; }
-        .trophy-btn:hover { transform: scale(1.2); }
 
-        /* 遊戲區域文字放大 */
-        #role-icon { font-size: 4.5rem; margin-top: 10px; }
-        .role-title { font-size: 1.6rem; margin: 10px 0; color: #444; }
-        #target-num-display { font-size: 2.2rem; color: var(--accent-red); letter-spacing: 3px; }
-        #dial-input-area { 
-            font-size: 1.8rem; margin: 15px 0; border-bottom: 4px dashed #ccc; 
-            width: 90%; min-height: 2.5rem; color: var(--pixel-black);
-        }
-
-        /* 撥號盤 */
+        /* 數字鍵盤 */
         #keypad {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 12px; width: 100%; padding: 15px; background: #eee;
@@ -137,30 +92,16 @@
             cursor: pointer; box-shadow: 4px 4px 0 var(--pixel-black);
         }
         .digit-key:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--pixel-black); }
-        .zh-char { font-size: 1.6rem; }
-        .zy-char { font-size: 0.6rem; color: #777; }
 
-        /* 收集冊 Modal */
         #medal-modal {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.98); z-index: 200;
             display: none; flex-direction: column; align-items: center; padding: 20px;
         }
-        .medal-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-            overflow-y: auto; width: 100%; padding: 10px;
-        }
-        .medal-slot {
-            display: flex; flex-direction: column; align-items: center;
-            opacity: 0.2; filter: grayscale(1); transition: 0.3s;
-        }
-        .medal-slot:hover { transform: scale(1.15); }
+        .medal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .medal-slot { opacity: 0.2; filter: grayscale(1); transition: 0.3s; text-align: center; }
         .medal-slot.active { opacity: 1; filter: grayscale(0); }
-        .medal-icon { font-size: 2.5rem; margin-bottom: 5px; }
-
-        /* 動畫 */
-        .calling-anim::after { content: ''; animation: callDots 1.5s infinite; }
-        @keyframes callDots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+        .medal-slot:hover { transform: scale(1.15); }
     </style>
 </head>
 <body class="case-black">
@@ -175,53 +116,51 @@
             </div>
 
             <div id="sc-setup" class="scene">
-                <div class="setup-container">
-                    <p style="font-size: 1.4rem;">你的名字：</p>
-                    <input type="text" id="in-name" class="setup-input" placeholder="小玩家">
-                    <p style="font-size: 1.4rem;">選手機殼顏色：</p>
-                    <div class="color-row">
-                        <div class="color-opt" style="background:#333" onclick="setCase('black')"></div>
-                        <div class="color-opt" style="background:#ffafcc" onclick="setCase('pink')"></div>
-                        <div class="color-opt" style="background:#b7e4c7" onclick="setCase('green')"></div>
-                        <div class="color-opt" style="background:#fee440" onclick="setCase('yellow')"></div>
-                    </div>
-                    <button class="btn-pixel" onclick="goStory()">確定</button>
+                <p style="font-size: 1.4rem;">你的名字：</p>
+                <input type="text" id="in-name" style="width: 80%; padding: 10px; border: 4px solid #000; text-align: center;" placeholder="小玩家">
+                <p style="font-size: 1.4rem;">顏色</p>
+                <div class="color-row">
+                    <div class="color-opt" style="background:#333" onclick="setCase('black')"></div>
+                    <div class="color-opt" style="background:#ffafcc" onclick="setCase('pink')"></div>
+                    <div class="color-opt" style="background:#b7e4c7" onclick="setCase('green')"></div>
+                    <div class="color-opt" style="background:#fee440" onclick="setCase('yellow')"></div>
                 </div>
+                <button class="btn-pixel" onclick="goStory()">GO</button>
             </div>
 
-            <div id="sc-story" class="scene" style="justify-content: flex-start; padding-top: 40px;">
+            <div id="sc-story" class="scene" style="justify-content: flex-start; padding-top: 30px;">
                 <div id="chat-container"></div>
-                <button id="story-next-btn" class="btn-pixel" style="margin-top:auto; display:none;" onclick="startGame()">幫他打電話!</button>
+                <div id="chat-options">
+                    <button class="btn-pixel" style="font-size: 1rem;" onclick="reply('ok')">好啊</button>
+                    <button class="btn-pixel" style="font-size: 1rem; background: #ddd;" onclick="reply('no')">不要</button>
+                </div>
             </div>
 
             <div id="sc-main" class="scene" style="justify-content: flex-start; padding: 0;">
                 <div id="nav-bar">
-                    <div class="nav-item hearts" id="ui-hearts">❤️❤️❤️</div>
-                    <div class="nav-item trophy-btn" onclick="openMedals()">🏆</div>
-                    <div class="nav-item" onclick="resetGame()">🚪</div>
+                    <div id="ui-hearts" style="color:var(--accent-red); font-size: 1.4rem;">❤️❤️❤️</div>
+                    <div style="font-size: 1.8rem; cursor:pointer;" onclick="openMedals()">🏆</div>
+                    <div style="font-size: 1.5rem; cursor:pointer;" onclick="resetGame()">🚪</div>
                 </div>
-                <div id="role-icon">👤</div>
-                <div class="role-title" id="ui-target-name"></div>
-                <div id="target-num-display">--------</div>
-                <div id="dial-input-area"></div>
+                <div id="role-icon" style="font-size: 4.5rem; margin-top: 10px;">👤</div>
+                <div id="ui-target-name" style="font-size: 1.5rem; margin: 5px 0;">打給...</div>
+                <div id="target-num-display" style="font-size: 2.2rem; color: var(--accent-red); letter-spacing: 3px;">--------</div>
+                <div id="dial-input-area" style="font-size: 1.8rem; margin: 15px 0; border-bottom: 4px dashed #ccc; width: 90%; min-height: 2.5rem;"></div>
                 <div id="keypad"></div>
             </div>
 
-            <div id="sc-calling" class="scene" style="background: #212121; color: white;">
-                <div style="font-size: 5rem;">📞</div>
-                <h2 class="calling-anim">正在撥號</h2>
+            <div id="sc-calling" class="scene" style="background:#212121; color:white;">
+                <div style="font-size: 5rem;">📞</div><h2 class="calling-anim">撥號中...</h2>
             </div>
-
             <div id="sc-result" class="scene">
                 <div id="res-icon" style="font-size: 5rem;"></div>
-                <h1 id="res-title" style="font-size: 2.2rem;"></h1>
-                <p id="res-msg" style="font-size: 1.3rem;"></p>
+                <h1 id="res-title"></h1><p id="res-msg"></p>
                 <button id="res-btn" class="btn-pixel" onclick="startGame()">下一題</button>
-                <button id="fail-btn" class="btn-pixel" style="display:none;" onclick="resetGame()">重來一次</button>
+                <button id="fail-btn" class="btn-pixel" style="display:none;" onclick="resetGame()">回首頁</button>
             </div>
 
             <div id="medal-modal">
-                <h2 style="font-size: 1.8rem; margin-bottom: 20px;">🏆 收集冊</h2>
+                <h2 style="font-size: 1.8rem;">🏆 收集冊</h2>
                 <div class="medal-grid" id="ui-medal-grid"></div>
                 <button class="btn-pixel" onclick="closeMedals()">關閉</button>
             </div>
@@ -231,7 +170,7 @@
 </div>
 
 <script>
-    // --- 遊戲資料 ---
+    // --- 角色與數字資料 (同前版本) ---
     const roles = [
         { id: 0, n: "警察局", i: "👮", num: "110", zy: "ㄐㄧㄥˇ ㄔㄚˊ ㄐㄩˊ" },
         { id: 1, n: "消防局", i: "👨‍🚒", num: "119", zy: "ㄒㄧㄠ ㄈㄤˊ ㄐㄩˊ" },
@@ -247,8 +186,7 @@
         { id: 11, n: "小花", i: "🌸", zy: "ㄒㄧㄠˇ ㄏㄨㄚ" },
         { id: 12, n: "大文", i: "📘", zy: "ㄉㄚˋ ㄨㄣˊ" }
     ];
-
-    const nums = [
+    const numsData = [
         {zh: '零', v: 0, z: 'ㄌㄧㄥˊ'}, {zh: '一', v: 1, z: 'ㄧ'},
         {zh: '二', v: 2, z: 'ㄦˋ'}, {zh: '三', v: 3, z: 'ㄙㄢ'},
         {zh: '四', v: 4, z: 'ㄙˋ'}, {zh: '五', v: 5, z: 'ㄨˇ'},
@@ -256,151 +194,117 @@
         {zh: '八', v: 8, z: 'ㄅㄚ'}, {zh: '九', v: 9, z: 'ㄐㄧㄡˇ'}
     ];
 
-    let state = {
-        playerName: "",
-        lives: 3,
-        collected: new Set(),
-        target: null,
-        targetNum: "",
-        input: ""
-    };
+    let state = { name: "", lives: 3, collected: new Set(), target: null, targetNum: "", input: "" };
+    let audioCtx, bgmInterval;
 
-    let audioCtx, bgmNode;
-
-    // --- 音效系統 (8-Bit 旋律) ---
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    // --- 活潑的 8-Bit BGM 引擎 ---
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
     function playBGM() {
-        if (bgmNode) return;
-        bgmNode = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        bgmNode.type = 'square';
-        // 循環簡短旋律 (C4-E4-G4-C5)
-        const melody = [261, 329, 392, 523];
-        let i = 0;
-        setInterval(() => {
-            if (bgmNode && audioCtx.state === 'running') {
-                bgmNode.frequency.setValueAtTime(melody[i % 4], audioCtx.currentTime);
-                i++;
+        if (bgmInterval) return;
+        const melody = [
+            // 第一句 (A)
+            523, 523, 587, 659, 523, 659, 587, 392, 440, 392, 440, 523, 
+            // 第二句 (B)
+            659, 659, 698, 783, 659, 783, 698, 523, 587, 523, 587, 659,
+            // 第三句 (C)
+            783, 880, 783, 659, 523, 659, 587, 392, 440, 523, 587, 523
+        ];
+        let step = 0;
+        bgmInterval = setInterval(() => {
+            if (audioCtx.state === 'running') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(melody[step % melody.length], audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+                step++;
             }
-        }, 500);
-        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-        bgmNode.connect(gain); gain.connect(audioCtx.destination);
-        bgmNode.start();
+        }, 250); 
     }
 
-    function toggleBGM(on) {
-        if (audioCtx) {
-            if (on) audioCtx.resume(); else audioCtx.suspend();
+    // --- 簡訊邏輯 ---
+    function goStory() {
+        state.name = document.getElementById('in-name').value || "小玩家";
+        switchScene('sc-story');
+        const chat = document.getElementById('chat-container');
+        chat.innerHTML = "";
+        const lines = ["救命啊！😱", "我忘記帶手機了...", "請幫我打電話"];
+        lines.forEach((l, i) => {
+            setTimeout(() => {
+                const b = document.createElement('div');
+                b.className = 'msg friend'; b.innerText = l;
+                chat.appendChild(b);
+                setTimeout(() => b.classList.add('show'), 50);
+                if(i === lines.length-1) document.getElementById('chat-options').style.display = 'flex';
+            }, i * 1200);
+        });
+    }
+
+    function reply(type) {
+        const chat = document.getElementById('chat-container');
+        const b = document.createElement('div');
+        b.className = 'msg me';
+        if(type === 'ok') {
+            b.innerText = "好啊！"; chat.appendChild(b);
+            setTimeout(() => b.classList.add('show'), 50);
+            setTimeout(startGame, 1000);
+        } else {
+            b.innerText = "不要。"; chat.appendChild(b);
+            setTimeout(() => b.classList.add('show'), 50);
+            setTimeout(resetGame, 1000);
         }
+        document.getElementById('chat-options').style.display = 'none';
     }
 
-    // --- 流程 ---
+    // --- 核心遊戲與 UI (維持定案邏輯) ---
     function switchScene(id) {
         document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function goSetup() { initAudio(); playBGM(); switchScene('sc-setup'); }
-
-    function setCase(c) { document.body.className = `case-${c}`; }
-
-    function goStory() {
-        state.playerName = document.getElementById('in-name').value || "小玩家";
-        switchScene('sc-story');
-        const chat = document.getElementById('chat-container');
-        chat.innerHTML = "";
-        const lines = [
-            `叮咚！📬`,
-            `${state.playerName}，救命啊！`,
-            `我忘記帶手機了...`,
-            `可以幫我撥電話給我的家人嗎？`
-        ];
-        lines.forEach((l, idx) => {
-            setTimeout(() => {
-                const b = document.createElement('div');
-                b.className = 'msg-bubble';
-                b.innerText = l;
-                chat.appendChild(b);
-                setTimeout(() => b.classList.add('show'), 50);
-                if(idx === lines.length - 1) document.getElementById('story-next-btn').style.display = 'block';
-            }, idx * 1200);
-        });
-    }
-
     function startGame() {
-        state.input = "";
-        document.getElementById('dial-input-area').innerText = "";
-        
-        // 優先選未收集
+        state.input = ""; document.getElementById('dial-input-area').innerText = "";
         let pool = roles.filter(r => !state.collected.has(r.id));
         if (pool.length === 0) pool = roles;
         state.target = pool[Math.floor(Math.random() * pool.length)];
-
-        state.targetNum = state.target.num || 
-            (Math.random() > 0.5 ? "09" : "") + Array.from({length: 8}, () => Math.floor(Math.random()*10)).join("");
-        
+        state.targetNum = state.target.num || Array.from({length: 10}, () => Math.floor(Math.random()*10)).join("");
         document.getElementById('ui-target-name').innerText = `打給：${state.target.n} (${state.target.zy})`;
         document.getElementById('role-icon').innerText = state.target.i;
         document.getElementById('target-num-display').innerText = state.targetNum;
-        
-        renderKeypad();
-        updateUI();
-        switchScene('sc-main');
+        renderKeypad(); updateUI(); switchScene('sc-main');
     }
 
     function renderKeypad() {
-        const pad = document.getElementById('keypad');
-        pad.innerHTML = "";
-        let shuffled = [...nums].sort(() => Math.random() - 0.5);
+        const pad = document.getElementById('keypad'); pad.innerHTML = "";
+        let shuffled = [...numsData].sort(() => Math.random() - 0.5);
         shuffled.slice(0, 9).forEach(n => pad.appendChild(makeKey(n)));
-        
-        pad.appendChild(makeAction("←", "#ffab91", () => {
-            state.input = state.input.slice(0, -1);
-            document.getElementById('dial-input-area').innerText = state.input;
-        }));
+        pad.appendChild(makeAction("←", "#ffab91", () => { state.input = state.input.slice(0, -1); document.getElementById('dial-input-area').innerText = state.input; }));
         pad.appendChild(makeKey(shuffled[9]));
         pad.appendChild(makeAction("📞", "#8ac926", handleCall));
     }
 
     function makeKey(n) {
-        const div = document.createElement('div');
-        div.className = 'digit-key';
-        div.innerHTML = `<span class="zh-char">${n.zh}</span><span class="zy-char">${n.z}</span>`;
-        div.onclick = () => {
-            if(state.input.length < 12) {
-                state.input += n.v;
-                document.getElementById('dial-input-area').innerText = state.input;
-                speak(n.zh);
-            }
-        };
-        return div;
+        const d = document.createElement('div'); d.className = 'digit-key';
+        d.innerHTML = `<span style="font-size:1.6rem">${n.zh}</span><span style="font-size:0.6rem; color:#777">${n.z}</span>`;
+        d.onclick = () => { if(state.input.length < 12) { state.input += n.v; document.getElementById('dial-input-area').innerText = state.input; speak(n.zh); } };
+        return d;
     }
 
-    function makeAction(txt, bg, cb) {
-        const div = document.createElement('div');
-        div.className = 'digit-key';
-        div.style.background = bg;
-        div.innerHTML = `<span class="zh-char" style="color:white">${txt}</span>`;
-        div.onclick = cb;
-        return div;
+    function makeAction(t, b, c) {
+        const d = document.createElement('div'); d.className = 'digit-key'; d.style.background = b;
+        d.innerHTML = `<span style="font-size:1.6rem; color:white">${t}</span>`; d.onclick = c;
+        return d;
     }
 
     function handleCall() {
         if(!state.input) return;
-        toggleBGM(false); // 撥號時靜音
-        switchScene('sc-calling');
-        let beeps = 0;
-        const timer = setInterval(() => {
-            playBeep(440, 0.5);
-            beeps++;
-            if(beeps >= 3) {
-                clearInterval(timer);
-                showResult();
-            }
-        }, 1000);
+        audioCtx.suspend(); switchScene('sc-calling');
+        let count = 0;
+        const timer = setInterval(() => { playBeep(440, 0.5); count++; if(count >= 3) { clearInterval(timer); showResult(); } }, 1000);
     }
 
     function showResult() {
@@ -409,74 +313,35 @@
         const icon = document.getElementById('res-icon');
         const title = document.getElementById('res-title');
         const msg = document.getElementById('res-msg');
-        
         if(win) {
-            icon.innerText = "🎉"; title.innerText = "成功通話！";
-            msg.innerText = "「喂，你好！」";
-            state.collected.add(state.target.id);
-            speak("喂，你好", () => {
-                setTimeout(openMedals, 500); // 語音完跳收集冊
-            });
-            document.getElementById('res-btn').style.display = "block";
-            document.getElementById('fail-btn').style.display = "none";
+            icon.innerText = "🎉"; title.innerText = "成功接通！"; msg.innerText = "「喂，你好！」";
+            state.collected.add(state.target.id); speak("喂，你好", () => setTimeout(openMedals, 500));
+            document.getElementById('res-btn').style.display = "block"; document.getElementById('fail-btn').style.display = "none";
         } else {
-            icon.innerText = "😵"; title.innerText = "打錯了！";
-            msg.innerText = "您撥的號碼是空號";
-            state.lives--;
-            speak("您撥的號碼是空號");
-            if(state.lives <= 0) {
-                title.innerText = "挑戰失敗";
-                document.getElementById('res-btn').style.display = "none";
-                document.getElementById('fail-btn').style.display = "block";
-            } else {
-                document.getElementById('res-btn').style.display = "block";
-                document.getElementById('fail-btn').style.display = "none";
-            }
+            icon.innerText = "😵"; title.innerText = "打錯了！"; msg.innerText = "您撥的號碼是空號";
+            state.lives--; speak("您撥的號碼是空號");
+            if(state.lives <= 0) { title.innerText = "挑戰失敗"; document.getElementById('res-btn').style.display = "none"; document.getElementById('fail-btn').style.display = "block"; }
+            else { document.getElementById('res-btn').style.display = "block"; document.getElementById('fail-btn').style.display = "none"; }
         }
-        updateUI();
-        toggleBGM(true);
+        updateUI(); audioCtx.resume();
     }
 
-    function updateUI() {
-        document.getElementById('ui-hearts').innerText = "❤️".repeat(state.lives);
-    }
-
+    function goSetup() { initAudio(); playBGM(); switchScene('sc-setup'); }
+    function setCase(c) { document.body.className = `case-${c}`; }
+    function updateUI() { document.getElementById('ui-hearts').innerText = "❤️".repeat(state.lives); }
     function openMedals() {
-        const grid = document.getElementById('ui-medal-grid');
-        grid.innerHTML = "";
+        const grid = document.getElementById('ui-medal-grid'); grid.innerHTML = "";
         roles.forEach(r => {
-            const slot = document.createElement('div');
-            slot.className = `medal-slot ${state.collected.has(r.id) ? 'active' : ''}`;
-            slot.innerHTML = `<div class="medal-icon">${r.i}</div><div style="font-size:0.8rem">${r.n}</div>`;
+            const slot = document.createElement('div'); slot.className = `medal-slot ${state.collected.has(r.id) ? 'active' : ''}`;
+            slot.innerHTML = `<div style="font-size:2.5rem">${r.i}</div><div style="font-size:0.8rem">${r.n}</div>`;
             grid.appendChild(slot);
         });
         document.getElementById('medal-modal').style.display = 'flex';
     }
-
     function closeMedals() { document.getElementById('medal-modal').style.display = 'none'; }
-
-    function resetGame() {
-        state.lives = 3; state.collected.clear();
-        toggleBGM(true); switchScene('sc-home');
-    }
-
-    function speak(t, cb) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(t);
-        u.lang = 'zh-TW';
-        if(cb) u.onend = cb;
-        window.speechSynthesis.speak(u);
-    }
-
-    function playBeep(f, d) {
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination);
-        o.frequency.value = f;
-        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
-        o.start(); o.stop(audioCtx.currentTime + d);
-    }
+    function resetGame() { state.lives = 3; state.collected.clear(); switchScene('sc-home'); }
+    function speak(t, cb) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'zh-TW'; if(cb) u.onend = cb; window.speechSynthesis.speak(u); }
+    function playBeep(f, d) { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination); o.frequency.value = f; g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d); o.start(); o.stop(audioCtx.currentTime + d); }
 </script>
 </body>
 </html>
